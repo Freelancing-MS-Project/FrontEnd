@@ -1,1 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+.portfolio-shell {
+  min-height: calc(100vh - 160px);
+  padding: 140px 32px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}

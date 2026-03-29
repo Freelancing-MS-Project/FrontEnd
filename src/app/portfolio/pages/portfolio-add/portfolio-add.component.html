@@ -1,0 +1,39 @@
+<div class="portfolio-shell add-shell">
+  <div class="portfolio-card form-card">
+    <h1 class="portfolio-page-title small-title">Add Portfolio Project</h1>
+    <p class="portfolio-page-subtitle">
+      Add a new project to strengthen your professional portfolio.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label>Title</label>
+        <input type="text" formControlName="title" placeholder="Ex: AI Job Recommendation System" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea rows="6" formControlName="description" placeholder="Describe the project, your role, technologies used, and results."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Project URL</label>
+        <input type="text" formControlName="projectUrl" placeholder="https://your-demo.com" />
+      </div>
+
+      <div class="field">
+        <label>Repository URL</label>
+        <input type="text" formControlName="repoUrl" placeholder="https://github.com/your-repo" />
+      </div>
+
+      <div *ngIf="error" class="portfolio-error">{{ error }}</div>
+
+      <div class="actions">
+        <button type="submit" class="portfolio-btn portfolio-btn-primary" [disabled]="loading">
+          {{ loading ? 'Saving...' : 'Create Project' }}
+        </button>
+        <a routerLink="/portfolio" class="portfolio-btn portfolio-btn-secondary">Back</a>
+      </div>
+    </form>
+  </div>
+</div>

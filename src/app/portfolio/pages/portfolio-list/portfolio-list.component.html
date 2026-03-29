@@ -1,0 +1,38 @@
+<div class="portfolio-shell">
+  <h1 class="portfolio-page-title">My Portfolio</h1>
+  <p class="portfolio-page-subtitle">
+    Showcase your projects, demos, repositories, and professional work.
+  </p>
+
+  <div class="top-actions">
+    <a routerLink="/portfolio/add" class="portfolio-btn portfolio-btn-primary">Add Project</a>
+    <a routerLink="/portfolio/analysis" class="portfolio-btn portfolio-btn-secondary">View Analysis</a>
+  </div>
+
+  <div *ngIf="loading" class="portfolio-empty">Loading portfolio projects...</div>
+  <div *ngIf="error" class="portfolio-error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && projects.length === 0" class="portfolio-empty">
+    No projects yet. Add your first portfolio project.
+  </div>
+
+  <div class="project-grid" *ngIf="!loading && !error && projects.length > 0">
+    <div class="portfolio-card project-card" *ngFor="let project of projects">
+      <div class="project-card-top">
+        <h3>{{ project.title }}</h3>
+        <span class="portfolio-badge">Media: {{ project.media.length }}</span>
+      </div>
+
+      <p class="project-description">{{ project.description }}</p>
+
+      <div class="project-links">
+        <a *ngIf="project.projectUrl" [href]="project.projectUrl" target="_blank" class="project-link">
+          Live Demo
+        </a>
+        <a *ngIf="project.repoUrl" [href]="project.repoUrl" target="_blank" class="project-link">
+          Repository
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="portfolio-shell">
+<div class="analysis-page">
+  <h2>Portfolio Analysis</h2>
+
+  <div *ngIf="loading" class="info-card">Loading analysis...</div>
+  <div *ngIf="error" class="error-card">{{ error }}</div>
+
+  <div *ngIf="analysis" class="analysis-grid">
+    <div class="main-card">
+      <h3>Overall Score</h3>
+      <div class="score">{{ analysis.score }}</div>
+      <div class="level">{{ analysis.level }}</div>
+    </div>
+
+    <div class="card">
+      <h4>Portfolio Stats</h4>
+      <p>Projects: {{ analysis.projectCount }}</p>
+      <p>Total Media: {{ analysis.totalMediaCount }}</p>
+      <p>Media Coverage: {{ analysis.mediaCoveragePercentage }}%</p>
+      <p>Average Description Length: {{ analysis.averageDescriptionLength }}</p>
+      <p>Projects With Repo: {{ analysis.projectsWithRepoUrl }}</p>
+      <p>Projects With Live URL: {{ analysis.projectsWithLiveUrl }}</p>
+    </div>
+
+    <div class="card">
+      <h4>Score Breakdown</h4>
+      <p>Project Score: {{ analysis.details.projectScore }}</p>
+      <p>Media Score: {{ analysis.details.mediaScore }}</p>
+      <p>Description Score: {{ analysis.details.descriptionScore }}</p>
+      <p>Repo Score: {{ analysis.details.repoScore }}</p>
+      <p>Live URL Score: {{ analysis.details.liveUrlScore }}</p>
+    </div>
+
+    <div class="card full-width">
+      <h4>Suggestions</h4>
+      <ul>
+        <li *ngFor="let suggestion of analysis.suggestions">
+          {{ suggestion }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
