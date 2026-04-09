@@ -47,8 +47,7 @@ export class FaceLoginComponent {
       next: (response: FaceLoginResponse) => {
         this.isSubmitting = false;
         this.successMessage = `Connexion réussie avec une confiance de ${Math.round(response.confidence * 100)}%.`;
-        const targetUrl = response.role === 'Admin' ? '/admin/users' : '/profile';
-        this.router.navigate([targetUrl]);
+        this.router.navigate(['/home']);
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;

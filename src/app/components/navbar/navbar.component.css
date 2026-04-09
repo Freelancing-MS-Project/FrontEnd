@@ -1,1 +1,36 @@
+.profile-link {
+  gap: 10px;
+}
 
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid color-mix(in srgb, var(--accent-color), transparent 65%);
+}
+
+.profile-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: color-mix(in srgb, var(--accent-color), white 80%);
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+.profile-email {
+  color: var(--heading-color);
+  font-family: var(--nav-font);
+  font-size: 14px;
+}
+
+.btn-logout {
+  border: 0;
+}
+
+@media (max-width: 1200px) {
+  .profile-email {
+    display: none;
+  }
+}

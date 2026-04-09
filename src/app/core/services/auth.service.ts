@@ -57,6 +57,42 @@ export class AuthService {
     return this.http.get<SessionResponse>(`${this.authUrl}/session`);
   }
 
+  restoreSession(): Observable<boolean> {
+    if (!this.getToken()) {
+      return of(false);
+    }
+
+    return this.getSession().pipe(
+      tap((session) => {
+        if (session.authenticated && session.email && session.role) {
+          localStorage.setItem(AUTH_STORAGE_KEYS.email, session.email);
+          localStorage.setItem(AUTH_STORAGE_KEYS.role, session.role);
+
+          if (session.userId !== undefined) {
+            localStorage.setItem(AUTH_STORAGE_KEYS.userId, String(session.userId));
+          }
+        } else if (!session.authenticated) {
+          this.logout();
+        }
+      }),
+      switchMap((session) => {
+        if (!session.authenticated) {
+          return of(false);
+        }
+
+        if (session.userId !== undefined) {
+          return of(true);
+        }
+
+        return this.fetchAndStoreConnectedUserId().pipe(
+          map(() => true),
+          catchError(() => of(true))
+        );
+      }),
+      catchError(() => of(this.isLoggedIn()))
+    );
+  }
+
   getConnectedUserId(): Observable<ConnectedUserResponse> {
     return this.http.get<ConnectedUserResponse>(`${this.authUrl}/getUserConnecteById`);
   }

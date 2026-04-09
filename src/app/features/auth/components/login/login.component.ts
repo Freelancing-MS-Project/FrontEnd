@@ -56,7 +56,6 @@ export class LoginComponent implements OnInit {
   }
 
   private navigateAfterLogin(): void {
-    const targetUrl = this.authService.getRole() === 'Admin' ? '/admin/users' : '/profile';
-    this.router.navigate([targetUrl]);
+    this.router.navigate(['/home']);
   }
 }
