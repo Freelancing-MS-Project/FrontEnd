@@ -1,0 +1,65 @@
+<section class="contact section">
+  <div class="container section-title" data-aos="fade-up">
+    <span>Administration</span>
+    <h2>Détail utilisateur</h2>
+    <p>Lecture via <code>GET /api/users/{{ '{' }}id{{ '}' }}</code>.</p>
+  </div>
+
+  <div class="container">
+    <div *ngIf="errorMessage" class="error-message d-block">{{ errorMessage }}</div>
+
+    <div *ngIf="isLoading" class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="contact-form card">
+          <div class="card-body p-4 p-lg-5">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="user && !isLoading" class="row gy-4">
+      <div class="col-lg-4">
+        <div class="contact-form card h-100">
+          <div class="card-body p-4 p-lg-5 text-center">
+            <img
+              *ngIf="imageUrl; else noImage"
+              [src]="imageUrl"
+              alt="Image utilisateur"
+              class="img-fluid rounded-circle mb-3"
+              width="140"
+              height="140"
+            />
+            <ng-template #noImage>
+              <div class="d-inline-flex align-items-center justify-content-center rounded-circle border mb-3 p-5">
+                {{ user.firstName.charAt(0) || user.email.charAt(0) }}
+              </div>
+            </ng-template>
+            <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+            <p>{{ user.email }}</p>
+            <span class="badge bg-secondary">{{ user.role }}</span>
+            <div class="mt-4">
+              <a class="btn btn-submit me-2" [routerLink]="['/admin/users', user.id, 'edit']">Modifier</a>
+              <a class="btn btn-outline-secondary" routerLink="/admin/users">Retour</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="contact-form card h-100">
+          <div class="card-body p-4 p-lg-5">
+            <div class="row gy-4">
+              <div class="col-md-6"><strong>ID</strong><div>{{ user.id }}</div></div>
+              <div class="col-md-6"><strong>Rôle</strong><div>{{ user.role }}</div></div>
+              <div class="col-md-6"><strong>Prénom</strong><div>{{ user.firstName || '-' }}</div></div>
+              <div class="col-md-6"><strong>Nom</strong><div>{{ user.lastName || '-' }}</div></div>
+              <div class="col-md-6"><strong>CIN</strong><div>{{ user.cin || '-' }}</div></div>
+              <div class="col-md-6"><strong>Image</strong><div>{{ user.userImageContentType || 'Aucune image' }}</div></div>
+              <div class="col-md-6"><strong>Créé le</strong><div>{{ user.createdAt | date:'medium' }}</div></div>
+              <div class="col-md-6"><strong>Mis à jour le</strong><div>{{ user.updatedAt | date:'medium' }}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
