@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {ReviewComponent} from './review.component';
 
 const routes: Routes = [
-  {path:'',component:ReviewComponent}
+  {path:'review',component:ReviewComponent}
 ];
 
 @NgModule({

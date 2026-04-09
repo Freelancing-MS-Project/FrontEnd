@@ -6,7 +6,7 @@ import { UpdateMissionComponent } from './update-mission/update-mission.componen
 import { AllMissionsComponent } from './all-missions/all-missions.component';
 
 const routes: Routes = [
-  {path:'',component:MissionComponent},
+{path:'',component:MissionComponent},
 {path:'createMission',component:CreateMissionComponent},
 {path:'update/:id',component:UpdateMissionComponent},
 {path:'allMissions',component:AllMissionsComponent}

@@ -1,1 +1,102 @@
-<p>review works!</p>
+<!-- reviews.component.html -->
+<body>
+<div class="reviews-card">
+  <!-- Rating Summary -->
+  <div class="rating-summary">
+    <div class="rating-big">
+      <div class="score">4.6</div>
+      <div class="stars">★★★★★</div>
+      <div class="count">12 avis</div>
+    </div>
+    <div class="rating-bars">
+      <div class="bar-row">
+        <span>5</span>
+        <i class="bi bi-star-fill star-icon"></i>
+        <div class="bar-track"><div class="bar-fill" style="width: 75%"></div></div>
+        <span>9</span>
+      </div>
+      <div class="bar-row">
+        <span>4</span>
+        <i class="bi bi-star-fill star-icon"></i>
+        <div class="bar-track"><div class="bar-fill" style="width: 17%"></div></div>
+        <span>2</span>
+      </div>
+      <div class="bar-row">
+        <span>3</span>
+        <i class="bi bi-star-fill star-icon"></i>
+        <div class="bar-track"><div class="bar-fill" style="width: 8%"></div></div>
+        <span>1</span>
+      </div>
+      <div class="bar-row">
+        <span>2</span>
+        <i class="bi bi-star-fill star-icon"></i>
+        <div class="bar-track"><div class="bar-fill" style="width: 0%"></div></div>
+        <span>0</span>
+      </div>
+      <div class="bar-row">
+        <span>1</span>
+        <i class="bi bi-star-fill star-icon"></i>
+        <div class="bar-track"><div class="bar-fill" style="width: 0%"></div></div>
+        <span>0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discussion Thread -->
+  <div class="thread">
+
+    <div class="message">
+      <div class="avatar" style="background: linear-gradient(135deg, #7b5ea7, #a07cc5)">AR</div>
+      <div class="bubble-wrap">
+        <div class="bubble-meta">
+          <span class="name">Aymen Rachdi</span>
+          <span class="time">il y a 2 jours</span>
+          <span class="bubble-stars">★★★★★</span>
+        </div>
+        <div class="bubble">
+          Excellente mission ! Le cahier des charges était très bien détaillé, les délais respectés
+          et la communication fluide. J'ai particulièrement apprécié la flexibilité sur l'architecture
+          choisie. Je recommande sans hésiter à tout développeur backend sérieux.
+        </div>
+        <div class="bubble-footer">
+          <button class="reaction-btn"><i class="bi bi-hand-thumbs-up"></i> Utile (4)</button>
+          <button class="reaction-btn"><i class="bi bi-reply"></i> Répondre</button>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+
+
+  </div>
+
+  <!-- Compose Box -->
+  <div class="compose-box">
+    <div class="compose-header">
+      <div class="avatar compose-avatar">Moi</div>
+      <span class="label">Laisser un avis</span>
+      <div class="star-rating">
+        <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
+        <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+        <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+        <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+        <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+      </div>
+    </div>
+    <textarea
+      class="compose-textarea"
+      placeholder="Partagez votre expérience avec cette mission…"
+      rows="3"
+    ></textarea>
+    <div class="compose-actions">
+      <span class="markdown-hint">Markdown supporté</span>
+      <button class="btn-primary">
+        <i class="bi bi-send-fill"></i> Publier l'avis
+      </button>
+    </div>
+  </div>
+
+</div>
+</body>
