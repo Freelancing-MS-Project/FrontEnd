@@ -1,0 +1,53 @@
+<section class="contact section">
+  <div class="container section-title" data-aos="fade-up">
+    <span>Administration</span>
+    <h2>{{ isEditMode ? 'Modifier un utilisateur' : 'Créer un utilisateur' }}</h2>
+    <p>{{ isEditMode ? 'Mise à jour via PUT /api/users/' + '{id}' : 'Création via POST /api/users' }}</p>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="contact-form card">
+          <div class="card-body p-4 p-lg-5">
+            <div *ngIf="errorMessage" class="error-message d-block">{{ errorMessage }}</div>
+            <div *ngIf="isLoading">Chargement...</div>
+
+            <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="submit()" class="php-email-form">
+              <div class="row gy-4">
+                <div class="col-md-6">
+                  <input id="email" class="form-control" type="email" formControlName="email" placeholder="Email" />
+                </div>
+                <div class="col-md-6">
+                  <input id="password" class="form-control" type="password" formControlName="password" [placeholder]="isEditMode ? 'Mot de passe optionnel' : 'Mot de passe'" />
+                </div>
+                <div class="col-md-6">
+                  <input id="firstName" class="form-control" type="text" formControlName="firstName" placeholder="Prénom" />
+                </div>
+                <div class="col-md-6">
+                  <input id="lastName" class="form-control" type="text" formControlName="lastName" placeholder="Nom" />
+                </div>
+                <div class="col-md-6">
+                  <input id="cin" class="form-control" type="text" formControlName="cin" placeholder="CIN" />
+                </div>
+                <div class="col-md-6">
+                  <select id="role" class="form-select" formControlName="role">
+                    <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+                  </select>
+                </div>
+                <div class="col-12 text-center">
+                  <button class="btn btn-submit w-100" type="submit" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Créer') }}
+                  </button>
+                </div>
+                <div class="col-12 text-center">
+                  <a routerLink="/admin/users">Retour à la liste</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
