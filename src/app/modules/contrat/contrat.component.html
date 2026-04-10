@@ -1,1 +1,131 @@
-<p>contrat works!</p>
+<section class="contrat section light-background">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <article class="contract-shell">
+          <header class="contract-head">
+            <span class="head-badge">
+              <i class="bi bi-file-earmark-check"></i>
+              Contract Signature
+            </span>
+            <h2>Review and Sign Freelancer Contract</h2>
+            <p>Verify contract details below, then draw your signature to finalize the agreement.</p>
+          </header>
+
+          <div *ngIf="isLoading" class="status-banner status-loading" role="status">
+            <i class="bi bi-hourglass-split"></i>
+            Loading contract details...
+          </div>
+
+          <form [formGroup]="contratForm" class="row g-3">
+            <div class="col-md-6">
+              <label for="id" class="form-label">
+                <i class="bi bi-hash"></i>
+                Contract ID
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-file-earmark-text"></i>
+                <input id="id" type="number" class="form-control" formControlName="id" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="missionId" class="form-label">
+                <i class="bi bi-briefcase"></i>
+                Mission ID
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-diagram-3"></i>
+                <input id="missionId" type="number" class="form-control" formControlName="missionId" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="clientId" class="form-label">
+                <i class="bi bi-building"></i>
+                Client
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-person-workspace"></i>
+                <input id="clientId" type="text" class="form-control" formControlName="clientId" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="freelancerId" class="form-label">
+                <i class="bi bi-person-badge"></i>
+                Freelancer
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-person-circle"></i>
+                <input id="freelancerId" type="text" class="form-control" formControlName="freelancerId" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="startDate" class="form-label">
+                <i class="bi bi-calendar-event"></i>
+                Start Date
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-calendar2-week"></i>
+                <input id="startDate" type="date" class="form-control" formControlName="startDate" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="endDate" class="form-label">
+                <i class="bi bi-calendar-check"></i>
+                End Date
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-calendar2-x"></i>
+                <input id="endDate" type="date" class="form-control" formControlName="endDate" readonly>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="amount" class="form-label">
+                <i class="bi bi-cash-coin"></i>
+                Amount (EUR)
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-currency-euro"></i>
+                <input id="amount" type="number" class="form-control" formControlName="amount" readonly>
+              </div>
+            </div>
+
+            <div class="col-12 mt-4">
+              <div class="signature-head">
+                <h3>
+                  <i class="bi bi-pen"></i>
+                  Signature Area
+                </h3>
+                <p>Use your mouse or touch input to sign inside the box.</p>
+              </div>
+              <div class="signature-wrapper">
+                <canvas #signatureCanvas class="signature-canvas"></canvas>
+              </div>
+            </div>
+
+            <div class="col-12 action-row">
+              <button type="button" class="btn btn-clear" (click)="clearSignature()">
+                <i class="bi bi-eraser"></i>
+                Clear
+              </button>
+              <button type="button" class="btn btn-sign" [disabled]="isSigning || isLoading" (click)="signContract()">
+                <i class="bi bi-pen-fill"></i>
+                {{ isSigning ? 'Signing...' : 'Sign Contract' }}
+              </button>
+            </div>
+          </form>
+
+          <div *ngIf="message" class="status-banner mt-4 mb-0" [ngClass]="messageType === 'success' ? 'status-success' : 'status-error'">
+            <i class="bi" [ngClass]="messageType === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ message }}
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
