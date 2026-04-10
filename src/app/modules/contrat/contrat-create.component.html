@@ -64,16 +64,17 @@
             </div>
 
             <div class="col-md-6">
-              <label for="clientId" class="form-label">
+              <label for="clientName" class="form-label">
                 <i class="bi bi-building"></i>
-                Client ID
+                Client Name
               </label>
               <div class="input-icon">
                 <i class="bi bi-person-workspace"></i>
-                <input id="clientId" type="text" class="form-control" formControlName="clientId" placeholder="Enter client id">
+                <input id="clientName" type="text" class="form-control" [value]="isLoadingClient ? 'Loading current client...' : clientDisplayName" placeholder="Client name" readonly>
+                <input type="hidden" formControlName="clientId">
               </div>
               <small *ngIf="createForm.get('clientId')?.invalid && createForm.get('clientId')?.touched" class="field-error">
-                Client ID is required.
+                Client information is required.
               </small>
             </div>
 
@@ -120,7 +121,7 @@
             </div>
 
             <div class="col-12 action-row">
-              <button type="submit" class="btn btn-send" [disabled]="isSubmitting">
+              <button type="submit" class="btn btn-send" [disabled]="isSubmitting || isLoadingClient">
                 <i class="bi bi-send-fill"></i>
                 {{ isSubmitting ? 'Sending...' : 'Send Contract' }}
               </button>

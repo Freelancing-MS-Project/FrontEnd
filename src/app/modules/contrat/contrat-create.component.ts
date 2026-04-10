@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContratService } from '../../services/contrat.service';
 import { Mission } from '../../models/mission';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-contrat-create',
@@ -12,13 +13,16 @@ export class ContratCreateComponent implements OnInit {
   createForm!: FormGroup;
   isSubmitting = false;
   isLoadingMissions = false;
+  isLoadingClient = false;
   missions: Mission[] = [];
+  clientDisplayName = '';
   message = '';
   messageType: 'success' | 'error' | '' = '';
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly contratService: ContratService
+    private readonly contratService: ContratService,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -32,6 +36,26 @@ export class ContratCreateComponent implements OnInit {
     });
 
     this.loadMissions();
+    this.loadConnectedClient();
+  }
+
+  private loadConnectedClient(): void {
+    this.isLoadingClient = true;
+    this.userService.getMe().subscribe({
+      next: (user) => {
+        this.clientDisplayName = `${user.firstName} ${user.lastName}`.trim();
+        this.createForm.patchValue({ clientId: String(user.id) });
+      },
+      error: () => {
+        this.clientDisplayName = '';
+        this.createForm.patchValue({ clientId: '' });
+        this.message = 'Unable to load current client information.';
+        this.messageType = 'error';
+      },
+      complete: () => {
+        this.isLoadingClient = false;
+      }
+    });
   }
 
   private loadMissions(): void {
@@ -70,7 +94,14 @@ export class ContratCreateComponent implements OnInit {
       next: (created) => {
         this.message = `Contract sent successfully. Contract ID: ${created.id ?? 'N/A'}`;
         this.messageType = 'success';
-        this.createForm.reset();
+        this.createForm.reset({
+          missionId: null,
+          clientId: this.createForm.get('clientId')?.value ?? '',
+          freelancerId: '',
+          startDate: '',
+          endDate: '',
+          amount: null
+        });
       },
       error: () => {
         this.message = 'Error while sending contract.';
