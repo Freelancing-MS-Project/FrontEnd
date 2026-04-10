@@ -1,0 +1,89 @@
+<section class="contrat section light-background">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <article class="contract-shell">
+          <header class="contract-head">
+            <span class="head-badge">
+              <i class="bi bi-card-list"></i>
+              Contracts Overview
+            </span>
+            <h2>All Freelancer Contracts</h2>
+            <p>Browse all contracts with quick access to signature details and agreement status.</p>
+          </header>
+
+          <div class="toolbar-row">
+            <a class="btn btn-create" routerLink="/contrats/create">
+              <i class="bi bi-plus-circle"></i>
+              Create New Contract
+            </a>
+            <button type="button" class="btn btn-refresh" (click)="loadContracts()" [disabled]="isLoading">
+              <i class="bi bi-arrow-clockwise"></i>
+              {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+            </button>
+          </div>
+
+          <div *ngIf="isLoading" class="status-banner status-loading" role="status">
+            <i class="bi bi-hourglass-split"></i>
+            Loading contracts...
+          </div>
+
+          <div *ngIf="!isLoading && contracts.length" class="table-shell">
+            <div class="table-responsive">
+              <table class="table contract-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>#ID</th>
+                    <th>Mission</th>
+                    <th>Client</th>
+                    <th>Freelancer</th>
+                    <th>Dates</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let contract of contracts">
+                    <td>
+                      <span class="mono">{{ contract.id }}</span>
+                    </td>
+                    <td>
+                      <span class="mono">{{ contract.missionId }}</span>
+                    </td>
+                    <td>{{ contract.clientId }}</td>
+                    <td>{{ contract.freelancerId }}</td>
+                    <td>
+                      <div class="date-pair">
+                        <span>{{ contract.startDate | date:'yyyy-MM-dd' }}</span>
+                        <i class="bi bi-arrow-right-short"></i>
+                        <span>{{ contract.endDate | date:'yyyy-MM-dd' }}</span>
+                      </div>
+                    </td>
+                    <td>{{ contract.amount | number:'1.0-2' }} EUR</td>
+                    <td>
+                      <span class="status-pill" [ngClass]="(contract.status || '').toLowerCase()">
+                        {{ contract.status || 'UNKNOWN' }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a class="btn btn-open" [routerLink]="['/contrats', contract.id]">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Open
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div *ngIf="message" class="status-banner mt-3 mb-0" [ngClass]="messageType === 'success' ? 'status-success' : 'status-error'">
+            <i class="bi" [ngClass]="messageType === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ message }}
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

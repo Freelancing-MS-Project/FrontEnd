@@ -4,6 +4,8 @@ import { Mission } from '../../models/mission';
 import { MissionStatus } from '../../models/mission-status';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import {AuthService} from '../../core/services/auth.service';
+import {map, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-mission',
@@ -13,8 +15,11 @@ import Swal from 'sweetalert2';
 export class MissionComponent implements OnInit {
 missions:Mission[]=[];
 readonly MissionStatus = MissionStatus;
-constructor(private missionService: MissionService,private router: Router) { }
-ngOnInit(): void {
+userId!:number;
+constructor(private missionService: MissionService,private router: Router, private authService:AuthService) { }
+/*ngOnInit(): void {
+  // Fetch missions for a specific client (replace 1 with actual client ID)
+
   this.missionService.getMissionsByClientId(1).subscribe({
     next: (missions) => {
       this.missions = missions;
@@ -23,7 +28,25 @@ ngOnInit(): void {
       console.error('Error fetching missions:', error);
     }
   });
-}
+}*/
+
+
+  ngOnInit(): void {
+    this.authService.getConnectedUserId().pipe(
+      map(res => typeof res === 'number' ? res : (res as any)?.id ?? (res as any)?.userId),
+      switchMap((id: number) => {
+        this.userId = id;
+        return this.missionService.getMissionsByClientId(id);
+      })
+    ).subscribe({
+      next: (missions) => {
+        this.missions = missions;
+      },
+      error: (error) => {
+        console.error('Error fetching missions:', error);
+      }
+    });
+  }
 
 
 onDeleteMission(id: number) {
