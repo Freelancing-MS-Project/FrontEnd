@@ -344,4 +344,85 @@ export class ReviewComponent implements OnInit {
   isEdited(review: Review): boolean {
     return review.updatedAt !== review.createdAt && review.updatedAt != null;
   }
+
+
+  // ── Mood ──
+readonly moods = [
+  { key: 'great', emoji: '🤩', label: 'Excellent', text: 'Excellente expérience !', stars: 5, color: '#e6f2ef', border: '#c8e4de', textColor: '#1a6b5a' },
+  { key: 'good',  emoji: '😊', label: 'Bien',      text: 'Bonne collaboration globale.', stars: 4, color: '#fdf7e6', border: '#f0dfa0', textColor: '#8a6a00' },
+  { key: 'ok',    emoji: '😐', label: 'Moyen',     text: 'Expérience correcte, quelques points à améliorer.', stars: 3, color: '#f9f8f5', border: '#e8e5dc', textColor: '#7a7869' },
+  { key: 'bad',   emoji: '😕', label: 'Déçu',      text: 'Expérience décevante sur plusieurs points.', stars: 2, color: '#fdeaea', border: '#f5c6c6', textColor: '#e85d5d' },
+];
+selectedMood: string | null = null;
+
+selectMood(mood: typeof this.moods[0]): void {
+  if (this.selectedMood === mood.key) {
+    this.selectedMood = null;
+    return;
+  }
+  this.selectedMood = mood.key;
+  if (!this.reviewComment.trim()) {
+    this.reviewComment = mood.text + ' ';
+  }
+  this.setRating(mood.stars);
+}
+
+getMoodBanner() {
+  return this.moods.find(m => m.key === this.selectedMood) ?? null;
+}
+
+// ── Emoji picker ──
+showEmojiPicker = false;
+emojiSearchQuery = '';
+activeEmojiCategory = 'faces';
+recentEmojis: string[] = [];
+
+readonly emojiCategories: Record<string, { icon: string; emojis: string[] }> = {
+  recent:   { icon: '🕐', emojis: [] },
+  faces:    { icon: '😀', emojis: ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','😈','👿'] },
+  gestures: { icon: '👍', emojis: ['👍','👎','👏','🙌','👐','🤲','🤝','🙏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','✋','🤚','🖐','🖖','💪','🦾','✍️','🤳','💅','🫶','🫵'] },
+  objects:  { icon: '💼', emojis: ['💼','📋','📌','📎','🗂️','🗃️','💡','🔧','⚙️','🛠️','🔑','🏆','🥇','🎯','🎖️','📊','📈','📉','💰','💵','💳','🖥️','💻','📱','⌨️','🖱️','📡','🔬','📝','📖'] },
+  symbols:  { icon: '✨', emojis: ['✅','❌','⚠️','🔴','🟠','🟡','🟢','🔵','🟣','⭐','🌟','💫','✨','🔥','❤️','🧡','💛','💚','💙','💜','🖤','🤍','❗','❓','💯','🎉','🎊','🚀','🌈','🔔'] },
+};
+
+getVisibleEmojis(): string[] {
+  const q = this.emojiSearchQuery.trim().toLowerCase();
+  if (q) {
+    return Object.values(this.emojiCategories)
+      .flatMap(c => c.emojis)
+      .filter(e => e.includes(q));
+  }
+  if (this.activeEmojiCategory === 'recent') return this.recentEmojis;
+  return this.emojiCategories[this.activeEmojiCategory]?.emojis ?? [];
+}
+
+insertEmoji(emoji: string, textareaEl: HTMLTextAreaElement): void {
+  const start = textareaEl.selectionStart ?? this.reviewComment.length;
+  const end   = textareaEl.selectionEnd   ?? start;
+  this.reviewComment = this.reviewComment.slice(0, start) + emoji + this.reviewComment.slice(end);
+  setTimeout(() => {
+    textareaEl.focus();
+    textareaEl.selectionStart = textareaEl.selectionEnd = start + emoji.length;
+  });
+  this.addRecentEmoji(emoji);
+}
+
+addRecentEmoji(emoji: string): void {
+  this.recentEmojis = [emoji, ...this.recentEmojis.filter(e => e !== emoji)].slice(0, 8);
+  this.emojiCategories['recent'].emojis = this.recentEmojis;
+}
+
+toggleEmojiPicker(): void {
+  this.showEmojiPicker = !this.showEmojiPicker;
+  if (this.showEmojiPicker) this.emojiSearchQuery = '';
+}
+
+// ── Star hint ──
+readonly starHints = ['', '😕 Pas top…', '😐 Peut mieux faire', '😊 C\'est bien !', '😍 Très bon !', '🤩 Parfait !'];
+
+getStarHintColor(): string {
+  if (this.selectedRating >= 4) return '#1a6b5a';
+  if (this.selectedRating === 3) return '#7a7869';
+  return '#e85d5d';
+}
 }

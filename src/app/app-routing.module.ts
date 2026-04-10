@@ -10,7 +10,9 @@ const routes: Routes = [
   { path: 'profiles', loadChildren: () => import('./modules/profile/profile.module').then(p => p.ProfileModule) },
   { path: 'missions', loadChildren: () => import('./modules/mission/mission.module').then(m => m.MissionModule) },
   { path: 'contrats', loadChildren: () => import('./modules/contrat/contrat.module').then(c=> c.ContratModule) },
-  { path: 'reviews', loadChildren: () => import('./modules/review/review.module').then(r=> r.ReviewModule) },
+  { path: 'reviews', loadChildren: () => import('./modules/review/review.module').then(r=> r.ReviewModule)
+    ,data: { showNavbar: false }
+  },
   { path: 'chats', loadChildren: () => import('./modules/chat/chat.module').then(ch =>ch.ChatModule) },
 
 ];

@@ -5,7 +5,7 @@
   --surface: #ffffff;
   --surface2: #f9f8f5;
   --border: #e8e5dc;
-  --accent: #1a6b5a;
+  --accent: #488d76  ;
   --accent-light: #e6f2ef;
   --accent2: #f0c96e;
   --text: #1c1c1a;
@@ -675,3 +675,204 @@
   .compose-header { flex-wrap: wrap; }
   .bubble-stars { margin-left: 0; }
 }
+/* ════════════════════════════
+   MOOD SELECTOR
+════════════════════════════ */
+.mood-selector {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.mood-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all 0.18s;
+  user-select: none;
+  white-space: nowrap;
+}
+.mood-pill .m-emoji { font-size: 17px; line-height: 1; }
+.mood-pill:hover    { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.mood-pill.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+.mood-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  animation: fadeUp 0.25s ease forwards;
+}
+.mood-banner-emoji { font-size: 20px; line-height: 1; }
+
+/* ════════════════════════════
+   STAR ROW
+════════════════════════════ */
+.star-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.star-row-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.stars-wrap     { display: flex; gap: 3px; }
+.star-hint      { font-size: 12px; font-style: italic; transition: color 0.2s; }
+.star-hint.muted { color: var(--muted); }
+
+/* ════════════════════════════
+   TEXTAREA + EMOJI TOGGLE
+════════════════════════════ */
+.textarea-wrap { position: relative; }
+
+.compose-textarea {
+  padding-bottom: 42px !important;
+}
+
+.emoji-toggle-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  transition: all 0.15s;
+  z-index: 2;
+}
+.emoji-toggle-btn:hover,
+.emoji-toggle-btn.active { background: var(--accent-light); border-color: var(--accent); }
+
+.char-count {
+  position: absolute;
+  bottom: 14px;
+  right: 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.char-count.over { color: var(--closed); }
+
+/* ════════════════════════════
+   EMOJI PICKER PANEL
+════════════════════════════ */
+.emoji-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 8px;
+  box-shadow: var(--shadow);
+  animation: fadeUp 0.2s ease forwards;
+}
+
+.ep-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.ep-tab {
+  background: none;
+  border: none;
+  font-size: 18px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: all 0.15s;
+}
+.ep-tab:hover,
+.ep-tab.active { opacity: 1; background: var(--accent-light); }
+
+.ep-search {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  background: var(--surface2);
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.ep-search:focus { border-color: var(--accent); }
+
+.ep-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.ep-grid::-webkit-scrollbar       { width: 4px; }
+.ep-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.ep-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  padding: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  line-height: 1;
+}
+.ep-btn:hover { background: var(--accent-light); }
+
+.ep-empty {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px;
+}
+
+/* ════════════════════════════
+   RECENT EMOJIS ROW
+════════════════════════════ */
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 0 0;
+  flex-wrap: wrap;
+}
+.recent-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-right: 2px; }
+.recent-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.recent-item:hover { background: var(--accent-light); border-color: var(--accent); }

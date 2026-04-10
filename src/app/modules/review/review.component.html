@@ -212,42 +212,128 @@
           </div>
         </div>
 
-        <!-- ── Compose Box ── -->
-        <div class="compose-box">
-          <div class="compose-header">
-            <div class="avatar compose-avatar"
-                 [style.background]="getAvatarColor(fromUser)">
-              {{ getInitials(fromUser) }}
-            </div>
-            <span class="compose-label">Laisser un avis</span>
-            <div class="star-rating" (mouseleave)="clearHover()">
-              <span *ngFor="let i of [5,4,3,2,1]"
-                    class="star-btn"
-                    [class.active]="getDisplayRating() >= i"
-                    (mouseenter)="setHover(i)"
-                    (click)="setRating(i)">★</span>
-            </div>
-          </div>
+       <!-- ── Compose Box ── -->
+<div class="compose-box">
 
-          <textarea
-            class="compose-textarea"
-            placeholder="Partagez votre expérience avec cette mission…"
-            rows="3"
-            [(ngModel)]="reviewComment">
-          </textarea>
+  <!-- Mood selector -->
+  <div class="compose-header">
+    <div class="avatar compose-avatar" [style.background]="getAvatarColor(fromUser)">
+      {{ getInitials(fromUser) }}
+    </div>
+    <span class="compose-label">Laisser un avis</span>
+    <div class="mood-selector">
+      <div class="mood-pill"
+           *ngFor="let mood of moods"
+           [class.selected]="selectedMood === mood.key"
+           (click)="selectMood(mood)">
+        <span class="m-emoji">{{ mood.emoji }}</span>
+        <span>{{ mood.label }}</span>
+      </div>
+    </div>
+  </div>
 
-          <div class="compose-actions">
-            <span class="markdown-hint">Markdown supporté</span>
-            <button class="btn-primary"
-                    [disabled]="!selectedRating || !reviewComment.trim() || submitting"
-                    (click)="submitReview()">
-              <span class="spinner-inline" *ngIf="submitting"></span>
-              <i class="bi bi-send-fill" *ngIf="!submitting"></i>
-              {{ submitting ? 'Publication…' : 'Publier l\'avis' }}
-            </button>
-          </div>
-        </div>
+  <!-- Mood banner -->
+  <div class="mood-banner"
+       *ngIf="getMoodBanner() as banner"
+       [style.background]="banner.color"
+       [style.border-color]="banner.border"
+       [style.color]="banner.textColor">
+    <span class="mood-banner-emoji">{{ banner.emoji }}</span>
+    {{ banner.text }}
+  </div>
 
+  <!-- Star row -->
+  <div class="star-row">
+    <span class="star-row-label">Note :</span>
+    <div class="stars-wrap" (mouseleave)="clearHover()">
+      <span *ngFor="let i of [1,2,3,4,5]"
+            class="star-btn"
+            [class.active]="getDisplayRating() >= i"
+            (mouseenter)="setHover(i)"
+            (click)="setRating(i)">★</span>
+    </div>
+    <span class="star-hint"
+          *ngIf="selectedRating > 0"
+          [style.color]="getStarHintColor()">
+      {{ starHints[selectedRating] }}
+    </span>
+    <span class="star-hint muted" *ngIf="selectedRating === 0">Choisissez une note</span>
+  </div>
+
+  <!-- Textarea + emoji toggle -->
+  <div class="textarea-wrap">
+    <textarea
+      #reviewTextarea
+      class="compose-textarea"
+      placeholder="Partagez votre expérience avec cette mission…"
+      rows="4"
+      [(ngModel)]="reviewComment"
+      maxlength="500">
+    </textarea>
+    <button class="emoji-toggle-btn"
+            [class.active]="showEmojiPicker"
+            (click)="toggleEmojiPicker()"
+            title="Insérer un emoji"
+            type="button">
+      😊
+    </button>
+    <span class="char-count"
+          [class.over]="reviewComment.length > 450">
+      {{ reviewComment.length }} / 500
+    </span>
+  </div>
+
+  <!-- Emoji picker panel -->
+  <div class="emoji-panel" *ngIf="showEmojiPicker">
+    <div class="ep-tabs">
+      <button *ngFor="let cat of emojiCategories | keyvalue"
+              class="ep-tab"
+              [class.active]="activeEmojiCategory === cat.key"
+              (click)="activeEmojiCategory = cat.key; emojiSearchQuery = ''"
+              type="button">
+        {{ cat.value.icon }}
+      </button>
+    </div>
+    <input class="ep-search"
+           [(ngModel)]="emojiSearchQuery"
+           placeholder="Rechercher un emoji…" />
+    <div class="ep-grid">
+      <button *ngFor="let em of getVisibleEmojis()"
+              class="ep-btn"
+              (click)="insertEmoji(em, reviewTextarea)"
+              type="button">
+        {{ em }}
+      </button>
+      <span *ngIf="getVisibleEmojis().length === 0" class="ep-empty">
+        Aucun résultat
+      </span>
+    </div>
+  </div>
+
+  <!-- Recent emojis row -->
+  <div class="recent-row" *ngIf="recentEmojis.length > 0 && !showEmojiPicker">
+    <span class="recent-label">Récents :</span>
+    <button *ngFor="let em of recentEmojis.slice(0,6)"
+            class="recent-item"
+            (click)="insertEmoji(em, reviewTextarea)"
+            type="button">
+      {{ em }}
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="compose-actions">
+    <span class="markdown-hint">Markdown supporté</span>
+    <button class="btn-primary"
+            [disabled]="!selectedRating || !reviewComment.trim() || submitting"
+            (click)="submitReview()">
+      <span class="spinner-inline" *ngIf="submitting"></span>
+      <i class="bi bi-send-fill" *ngIf="!submitting"></i>
+      {{ submitting ? 'Publication…' : 'Publier l\'avis' }}
+    </button>
+  </div>
+
+</div>
       </ng-container>
     </div>
     <!-- end reviews-card -->
