@@ -107,6 +107,12 @@
               <span>{{ mission.finishedAt | date: 'mediumDate' }}</span>
             </div>
           </div>
+          <div class="mission-actions">
+            <button type="button" class="btn btn-link btn-ghost" (click)="mission.id && onViewDetails(mission.id)">
+              <i class="bi bi-eye"></i> View Details
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

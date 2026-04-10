@@ -3,6 +3,8 @@ import { MissionService } from '../../../services/mission.service';
 import { Mission } from '../../../models/mission';
 import { MissionStatus } from '../../../models/mission-status';
 import { Domain } from '../../../models/domain';
+import { ReviewService } from '../../../services/review.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-all-missions',
@@ -36,7 +38,8 @@ export class AllMissionsComponent implements OnInit {
   selectedDomain: Domain | 'ALL' = 'ALL';
   selectedStatus: MissionStatus | 'ALL' = 'ALL';
 
-  constructor(private missionService: MissionService) {}
+  constructor(private missionService: MissionService, private reviewService: ReviewService, private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.missionService.getAllMissions().subscribe({
@@ -49,6 +52,24 @@ export class AllMissionsComponent implements OnInit {
       }
     });
   }
+
+
+
+onViewDetails(missionId: number): void {
+  this.reviewService.getMissionDetails(missionId).subscribe({
+    next: (missionDetails) => {
+      console.log('Mission details:', missionDetails);
+      this.router.navigate(['/reviews', 'mission', missionId, 'details'], {
+        state: { mission: missionDetails }
+      });
+    },
+    error: (err) => {
+      console.error('Erreur lors de la récupération des détails:', err);
+    }
+  });
+}
+
+
 
   applyFilters(): void {
     this.filteredMissions = this.missions.filter((mission) => {

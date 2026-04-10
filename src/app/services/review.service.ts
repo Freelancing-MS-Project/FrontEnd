@@ -61,4 +61,8 @@ export class ReviewService {
   getMissionDetails(missionId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/mission/${missionId}/details`);
   }
+  getReviewsByMissionId(missionId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.baseUrl}/mission/${missionId}`);
+  }
+
 }

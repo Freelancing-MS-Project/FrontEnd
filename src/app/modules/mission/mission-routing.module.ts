@@ -4,12 +4,14 @@ import {MissionComponent} from './mission.component';
 import { CreateMissionComponent } from './create-mission/create-mission.component';
 import { UpdateMissionComponent } from './update-mission/update-mission.component';
 import { AllMissionsComponent } from './all-missions/all-missions.component';
+import { ReviewComponent } from '../review/review.component';
 
 const routes: Routes = [
 {path:'',component:MissionComponent},
 {path:'createMission',component:CreateMissionComponent},
 {path:'update/:id',component:UpdateMissionComponent},
-{path:'allMissions',component:AllMissionsComponent}
+{path:'allMissions',component:AllMissionsComponent},
+
 ];
 
 @NgModule({

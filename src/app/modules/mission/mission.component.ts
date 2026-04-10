@@ -25,6 +25,7 @@ ngOnInit(): void {
   });
 }
 
+
 onDeleteMission(id: number) {
   Swal.fire({
     title: 'Delete mission?',
