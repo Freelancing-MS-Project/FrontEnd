@@ -1,0 +1,139 @@
+<section class="contrat section light-background">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-9">
+        <article class="contract-shell">
+          <header class="contract-head">
+            <span class="head-badge">
+              <i class="bi bi-send-check"></i>
+              Contract Creation
+            </span>
+            <h2>Create and Send a Freelancer Contract</h2>
+            <p>Fill in mission and participant details to generate a new contract ready for signature.</p>
+          </header>
+
+          <div class="info-strip">
+            <div class="info-chip">
+              <i class="bi bi-shield-check"></i>
+              <span>Secure Agreement Flow</span>
+            </div>
+            <div class="info-chip">
+              <i class="bi bi-lightning-charge"></i>
+              <span>Fast Contract Delivery</span>
+            </div>
+            <div class="info-chip">
+              <i class="bi bi-file-earmark-lock2"></i>
+              <span>Trackable Contract ID</span>
+            </div>
+          </div>
+
+          <form [formGroup]="createForm" class="row g-3" (ngSubmit)="sendContract()">
+            <div class="col-md-6">
+              <label for="missionId" class="form-label">
+                <i class="bi bi-briefcase"></i>
+                Mission
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-diagram-3"></i>
+                <select id="missionId" class="form-control" formControlName="missionId" [disabled]="isLoadingMissions">
+                  <option [ngValue]="null" disabled>
+                    {{ isLoadingMissions ? 'Loading missions...' : 'Select a mission' }}
+                  </option>
+                  <option *ngFor="let mission of missions" [ngValue]="mission.id">
+                    {{ mission.title }} (ID: {{ mission.id }})
+                  </option>
+                </select>
+              </div>
+              <small *ngIf="createForm.get('missionId')?.invalid && createForm.get('missionId')?.touched" class="field-error">
+                Mission is required.
+              </small>
+            </div>
+
+            <div class="col-md-6">
+              <label for="amount" class="form-label">
+                <i class="bi bi-cash-stack"></i>
+                Amount (EUR)
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-currency-euro"></i>
+                <input id="amount" type="number" class="form-control" formControlName="amount" placeholder="Enter contract amount">
+              </div>
+              <small *ngIf="createForm.get('amount')?.invalid && createForm.get('amount')?.touched" class="field-error">
+                Amount is required and must be greater than 0.
+              </small>
+            </div>
+
+            <div class="col-md-6">
+              <label for="clientName" class="form-label">
+                <i class="bi bi-building"></i>
+                Client Name
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-person-workspace"></i>
+                <input id="clientName" type="text" class="form-control" [value]="isLoadingClient ? 'Loading current client...' : clientDisplayName" placeholder="Client name" readonly>
+                <input type="hidden" formControlName="clientId">
+              </div>
+              <small *ngIf="createForm.get('clientId')?.invalid && createForm.get('clientId')?.touched" class="field-error">
+                Client information is required.
+              </small>
+            </div>
+
+            <div class="col-md-6">
+              <label for="freelancerId" class="form-label">
+                <i class="bi bi-person-badge"></i>
+                Freelancer ID
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-person-circle"></i>
+                <input id="freelancerId" type="text" class="form-control" formControlName="freelancerId" placeholder="Enter freelancer id">
+              </div>
+              <small *ngIf="createForm.get('freelancerId')?.invalid && createForm.get('freelancerId')?.touched" class="field-error">
+                Freelancer ID is required.
+              </small>
+            </div>
+
+            <div class="col-md-6">
+              <label for="startDate" class="form-label">
+                <i class="bi bi-calendar-event"></i>
+                Start Date
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-calendar2-week"></i>
+                <input id="startDate" type="date" class="form-control" formControlName="startDate">
+              </div>
+              <small *ngIf="createForm.get('startDate')?.invalid && createForm.get('startDate')?.touched" class="field-error">
+                Start date is required.
+              </small>
+            </div>
+
+            <div class="col-md-6">
+              <label for="endDate" class="form-label">
+                <i class="bi bi-calendar-check"></i>
+                End Date
+              </label>
+              <div class="input-icon">
+                <i class="bi bi-calendar2-x"></i>
+                <input id="endDate" type="date" class="form-control" formControlName="endDate">
+              </div>
+              <small *ngIf="createForm.get('endDate')?.invalid && createForm.get('endDate')?.touched" class="field-error">
+                End date is required.
+              </small>
+            </div>
+
+            <div class="col-12 action-row">
+              <button type="submit" class="btn btn-send" [disabled]="isSubmitting || isLoadingClient">
+                <i class="bi bi-send-fill"></i>
+                {{ isSubmitting ? 'Sending...' : 'Send Contract' }}
+              </button>
+            </div>
+          </form>
+
+          <div *ngIf="message" class="status-banner mt-4 mb-0" [ngClass]="messageType === 'success' ? 'status-success' : 'status-error'">
+            <i class="bi" [ngClass]="messageType === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ message }}
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

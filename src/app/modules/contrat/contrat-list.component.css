@@ -1,0 +1,201 @@
+.contrat {
+  padding: 90px 0 60px;
+}
+
+.contract-shell {
+  background: var(--surface-color);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 88%);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 1.75rem;
+}
+
+.contract-head {
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color), transparent 92%), var(--surface-color));
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
+}
+
+.head-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: color-mix(in srgb, var(--accent-color), transparent 86%);
+  color: var(--accent-color);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.86rem;
+}
+
+.contract-head h2 {
+  margin: 0.85rem 0 0.5rem;
+  color: var(--heading-color);
+  font-size: 1.55rem;
+}
+
+.contract-head p {
+  margin: 0;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.btn-create,
+.btn-refresh,
+.btn-open {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 0.6rem 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-create {
+  border: none;
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.btn-create:hover,
+.btn-create:focus {
+  color: var(--contrast-color);
+  background: color-mix(in srgb, var(--accent-color), black 8%);
+}
+
+.btn-refresh {
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 75%);
+  background: var(--surface-color);
+  color: var(--default-color);
+}
+
+.btn-refresh:hover {
+  border-color: color-mix(in srgb, var(--default-color), transparent 58%);
+  background: color-mix(in srgb, var(--default-color), transparent 95%);
+}
+
+.btn-open {
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 55%);
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color), transparent 94%);
+}
+
+.btn-open:hover,
+.btn-open:focus {
+  color: var(--contrast-color);
+  background: var(--accent-color);
+}
+
+.table-shell {
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 88%);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.contract-table thead th {
+  background: color-mix(in srgb, var(--accent-color), transparent 93%);
+  color: var(--heading-color);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.contract-table td,
+.contract-table th {
+  padding: 0.8rem 0.75rem;
+  border-color: color-mix(in srgb, var(--default-color), transparent 90%);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-weight: 600;
+}
+
+.date-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.date-pair i {
+  color: color-mix(in srgb, var(--default-color), transparent 45%);
+}
+
+.status-pill {
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.status-pill.active,
+.status-pill.signed {
+  color: #0f5132;
+  border-color: #a8dbc2;
+  background: #e8f7ee;
+}
+
+.status-pill.pending {
+  color: #7a4b00;
+  border-color: #f0d194;
+  background: #fff6e1;
+}
+
+.status-pill.cancelled,
+.status-pill.rejected {
+  color: #842029;
+  border-color: #efbac2;
+  background: #fdecef;
+}
+
+.status-banner {
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.status-loading {
+  color: #0c5460;
+  border-color: #9fd7e0;
+  background: #e3f5f8;
+}
+
+.status-success {
+  color: #0f5132;
+  border-color: #a8dbc2;
+  background: #e8f7ee;
+}
+
+.status-error {
+  color: #842029;
+  border-color: #efbac2;
+  background: #fdecef;
+}
+
+@media (max-width: 768px) {
+  .contrat {
+    padding-top: 80px;
+  }
+
+  .contract-shell {
+    padding: 1.1rem;
+  }
+
+  .contract-head h2 {
+    font-size: 1.3rem;
+  }
+}

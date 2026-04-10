@@ -13,7 +13,7 @@
 .contract-head {
   border-radius: 16px;
   padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.1rem;
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color), transparent 92%), var(--surface-color));
   border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
 }
@@ -39,6 +39,31 @@
 .contract-head p {
   margin: 0;
   color: color-mix(in srgb, var(--default-color), transparent 20%);
+}
+
+.info-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1.4rem;
+}
+
+.info-chip {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 88%);
+  background: color-mix(in srgb, var(--surface-color), var(--accent-color) 3%);
+  color: var(--default-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  padding: 0.65rem 0.8rem;
+  min-height: 50px;
+}
+
+.info-chip i {
+  color: var(--accent-color);
+  font-size: 1rem;
 }
 
 .form-label {
@@ -75,95 +100,43 @@
   border: 1px solid color-mix(in srgb, var(--default-color), transparent 84%);
 }
 
-.input-icon .form-control[readonly] {
-  background-color: color-mix(in srgb, var(--accent-color), transparent 96%);
-}
-
 .input-icon .form-control:focus {
   border-color: color-mix(in srgb, var(--accent-color), transparent 45%);
   box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 88%);
 }
 
-.signature-head {
-  margin-bottom: 0.75rem;
-}
-
-.signature-head h3 {
-  margin: 0;
-  color: var(--heading-color);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.15rem;
-}
-
-.signature-head h3 i {
-  color: var(--accent-color);
-}
-
-.signature-head p {
-  margin: 0.45rem 0 0;
-  color: color-mix(in srgb, var(--default-color), transparent 20%);
-}
-
-.signature-wrapper {
-  width: 100%;
-  border: 1px dashed color-mix(in srgb, var(--accent-color), transparent 55%);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--surface-color), var(--accent-color) 2%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color), transparent 92%);
-}
-
-.signature-canvas {
-  width: 100%;
-  height: 220px;
+.field-error {
+  color: #b4232f;
   display: block;
-  border-radius: 16px;
-  cursor: crosshair;
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
 .action-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  margin-top: 0.4rem;
+  margin-top: 0.45rem;
 }
 
-.btn-clear,
-.btn-sign {
+.btn-send {
+  border: none;
   border-radius: 10px;
   font-weight: 600;
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1.15rem;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-}
-
-.btn-clear {
-  border: 1px solid color-mix(in srgb, var(--default-color), transparent 75%);
-  color: var(--default-color);
-  background: var(--surface-color);
-}
-
-.btn-clear:hover {
-  border-color: color-mix(in srgb, var(--default-color), transparent 58%);
-  background: color-mix(in srgb, var(--default-color), transparent 95%);
-}
-
-.btn-sign {
-  border: none;
   color: var(--contrast-color);
   background: var(--accent-color);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
-.btn-sign:hover,
-.btn-sign:focus {
-  background: color-mix(in srgb, var(--accent-color), black 8%);
+.btn-send:hover,
+.btn-send:focus {
   color: var(--contrast-color);
+  background: color-mix(in srgb, var(--accent-color), black 8%);
 }
 
-.btn-sign:disabled {
+.btn-send:disabled {
   opacity: 0.7;
   box-shadow: none;
 }
@@ -178,12 +151,6 @@
   border: 1px solid transparent;
 }
 
-.status-loading {
-  color: #0c5460;
-  border-color: #9fd7e0;
-  background: #e3f5f8;
-}
-
 .status-success {
   color: #0f5132;
   border-color: #a8dbc2;
@@ -194,6 +161,16 @@
   color: #842029;
   border-color: #efbac2;
   background: #fdecef;
+}
+
+.contrat .form-control.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
+
+@media (max-width: 992px) {
+  .info-strip {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
