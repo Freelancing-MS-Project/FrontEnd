@@ -1,0 +1,96 @@
+<section class="section light-background">
+  <div class="container">
+    <div class="section-title">
+      <h2>Update Mission</h2>
+      <span>Update Mission</span>
+      <p>Update the scope, skills, and budget to find the right freelancer.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="contact-form mission-form p-4 p-lg-5">
+          <div class="mission-form-header">
+            <div class="mission-form-icon">
+              <i class="bi bi-briefcase"></i>
+            </div>
+            <div>
+              <h3>Update Mission </h3>
+              <p>Share clear requirements to attract qualified freelancers.</p>
+            </div>
+          </div>
+          <form  [formGroup]="missionForm" (ngSubmit)="onSubmit()">
+            <div class="row g-4">
+              <div class="col-md-8">
+                <label class="form-label" for="mission-title">Title</label>
+                <input id="mission-title" type="text" class="form-control" formControlName="title" placeholder="Ex: Build a responsive landing page">
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('title')?.touched && missionForm.get('title')?.invalid">
+                  <span *ngIf="missionForm.get('title')?.errors?.['required']">Title is required.</span>
+                  <span *ngIf="missionForm.get('title')?.errors?.['minlength']">Title must be at least 10 characters.</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="mission-domain">Domain</label>
+                <select id="mission-domain" class="form-select" formControlName="domain">
+                  <option value="WEB_DEVELOPMENT">Web Development</option>
+                  <option value="MOBILE_DEVELOPMENT">Mobile Development</option>
+                  <option value="DATA_SCIENCE">Data Science</option>
+                  <option value="DESIGN">Design</option>
+                  <option value="MARKETING">Marketing</option>
+                  <option value="DEVOPS">DevOps</option>
+                  <option value="CYBERSECURITY">Cybersecurity</option>
+                </select>
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('domain')?.touched && missionForm.get('domain')?.invalid">
+                  <span *ngIf="missionForm.get('domain')?.errors?.['required']">Domain is required.</span>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label" for="mission-description">Description</label>
+                <textarea id="mission-description" rows="5" class="form-control" formControlName="description" placeholder="Describe goals, deliverables, and expectations"></textarea>
+                <div class="form-text">Be specific about scope, tools, and expected outcomes.</div>
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('description')?.touched && missionForm.get('description')?.invalid">
+                  <span *ngIf="missionForm.get('description')?.errors?.['required']">Description is required.</span>
+                  <span *ngIf="missionForm.get('description')?.errors?.['minlength']">Description must be at least 20 characters.</span>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" for="mission-duration">Duration (weeks)</label>
+                <input id="mission-duration" type="number" min="1" class="form-control" formControlName="durationInWeeks" placeholder="Ex: 6">
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('durationInWeeks')?.touched && missionForm.get('durationInWeeks')?.invalid">
+                  <span *ngIf="missionForm.get('durationInWeeks')?.errors?.['required']">Duration is required.</span>
+                  <span *ngIf="missionForm.get('durationInWeeks')?.errors?.['min']">Duration must be at least 1 week.</span>
+                  <span *ngIf="missionForm.get('durationInWeeks')?.errors?.['max']">Duration cannot exceed 52 weeks.</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="mission-budget">Budget</label>
+                <input id="mission-budget" type="number" min="0" class="form-control" formControlName="budget" placeholder="Ex: 1200">
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('budget')?.touched && missionForm.get('budget')?.invalid">
+                  <span *ngIf="missionForm.get('budget')?.errors?.['required']">Budget is required.</span>
+                  <span *ngIf="missionForm.get('budget')?.errors?.['min']">Budget must be at least 100.</span>
+                </div>
+              </div>
+
+
+              <div class="col-md-4">
+                <label class="form-label" for="mission-finished-at">Finished at</label>
+                <input id="mission-finished-at" type="date" class="form-control" formControlName="finishedAt" [attr.min]="today">
+                <div class="text-danger small mt-1" *ngIf="missionForm.get('finishedAt')?.touched && missionForm.get('finishedAt')?.invalid">
+                  <span *ngIf="missionForm.get('finishedAt')?.errors?.['required']">Finish date is required.</span>
+                  <span *ngIf="missionForm.get('finishedAt')?.errors?.['pastDate']">Finish date cannot be in the past.</span>
+                </div>
+              </div>
+
+              <div class="col-12 d-flex flex-column flex-md-row gap-3 justify-content-end">
+
+                <button type="button" class="btn btn-accent" (click)="onCancel()">Cancel</button>
+                <button type="submit" class="btn btn-accent" [disabled]="missionForm.invalid">Update mission</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

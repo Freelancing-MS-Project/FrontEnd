@@ -1,1 +1,72 @@
-<p>mission works!</p>
+<section class="section light-background">
+  <div class="container">
+    <div class="section-title">
+      <h2>My Missions</h2>
+      <span>Missions</span>
+      <p>All missions created by your account </p>
+    </div>
+
+    <div class="row g-4" *ngIf="missions?.length; else emptyState">
+      <div class="col-md-6 col-lg-4">
+        <a class="mission-card add-card h-100" routerLink="/missions/createMission">
+          <div class="add-card-content">
+            <span class="add-card-plus">+</span>
+            <span class="add-card-text">Create Mission</span>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4" *ngFor="let mission of missions">
+        <div class="mission-card h-100">
+          <div class="mission-card-header">
+            <div class="mission-icon">
+              <i class="bi bi-briefcase"></i>
+            </div>
+            <div class="mission-title">
+              <h3>{{ mission.title }}</h3>
+              <span class="mission-domain">{{ mission.domain }}</span>
+            </div>
+            <span class="mission-status" [ngClass]="{
+              'status-open': mission.status === MissionStatus.Open,
+              'status-archived': mission.status === MissionStatus.Archived,
+              'status-closed': mission.status === MissionStatus.Closed
+            }">{{ mission.status }}</span>
+          </div>
+          <p class="mission-description">{{ mission.description }}</p>
+          <div class="mission-meta">
+            <div class="meta-item">
+              <i class="bi bi-calendar2-week"></i>
+              <span>{{ mission.durationInWeeks }} weeks</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-cash-coin"></i>
+              <span>{{ mission.budget | currency:'TND':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-calendar-event"></i>
+              <span>{{ mission.finishedAt | date: 'mediumDate' }}</span>
+            </div>
+          </div>
+          <div class="mission-actions">
+            <button type="button" class="btn btn-link btn-ghost" (click)="mission.id && onEdit(mission.id)">
+              <i class="bi bi-pencil-square"></i> Update
+            </button>
+            <button type="button" class="btn btn-link btn-ghost text-danger" (click)="mission.id && onDeleteMission(mission.id)">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 42px; color: var(--accent-color);"></i>
+        <h4 class="mt-3">No missions yet</h4>
+        <p class="mb-0">Create your first mission to get started.</p>
+<br>
+        <button routerLink="/missions/createMission" class="btn btn-accent">Create Mission</button>
+
+      </div>
+    </ng-template>
+  </div>
+</section>
