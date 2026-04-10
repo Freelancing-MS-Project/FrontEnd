@@ -5,6 +5,8 @@ import { MissionService } from '../../../services/mission.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { MissionStatus } from '../../../models/mission-status';
+import { AuthService } from '../../../core/services/auth.service';
+import { map } from 'rxjs';
 @Component({
   selector: 'app-create-mission',
   templateUrl: './create-mission.component.html',
@@ -18,8 +20,10 @@ export class CreateMissionComponent implements OnInit {
   message: string = '';
   error: string = '';
 today!: string;
+userId!:number;
 
-constructor(private missionService: MissionService,private fb:FormBuilder,private router:Router) {
+
+constructor(private missionService: MissionService,private fb:FormBuilder,private router:Router,private authService:AuthService) {
   }
 futureDateValidator(control: any) {
   if (!control.value) return null;
@@ -50,12 +54,22 @@ durationInWeeks:['',[Validators.required,Validators.min(1),Validators.max(52)]],
 finishedAt:['',[Validators.required,this.futureDateValidator.bind(this)]],
 
 });
+this.authService.getConnectedUserId().pipe(
+      map(res => typeof res === 'number' ? res : (res as any)?.id ?? (res as any)?.userId)
+    ).subscribe({
+      next: (id: number) => {
+        this.userId = id;
+      },
+      error: (error) => {
+        console.error('Error fetching connected user ID:', error);
+      }
+    });
 }
 
 onSubmit(){
  if(this.missionForm.valid){
 //récupérerl'id du client connecté
-const clientId = 1;
+const clientId = this.userId || this.authService.getUserId();
 if(!clientId){
             this.error = 'Client ID not found in local storage';
             console.error(this.error);
