@@ -1,15 +1,13 @@
 <header id="header" class="header d-flex align-items-center fixed-top">
   <div class="container position-relative d-flex align-items-center justify-content-between">
 
-    <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
-      <!-- Uncomment the line below if you also wish to use an image logo -->
-      <!-- <img src="assets/img/logo.webp" alt=""> -->
+    <a routerLink="/home" class="logo d-flex align-items-center me-auto me-xl-0">
       <h1 class="sitename">Landify</h1>
     </a>
 
     <nav id="navmenu" class="navmenu">
       <ul>
-        <li><a href="#hero" class="active">Home</a></li>
+        <li><a routerLink="/home">Home</a></li>
         <li><a href="#about">About</a></li>
         <li><a routerLink="/missions/allMissions" routerLinkActive="active">Missions</a></li>
         <li><a routerLink="/missions" routerLinkActive="active">My Missions</a></li>
@@ -33,12 +31,28 @@
           </ul>
         </li>
         <li><a href="#contact">Contact</a></li>
+        <li *ngIf="isAdmin"><a routerLink="/admin/users">Users Admin</a></li>
       </ul>
       <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
 
     </nav>
 
-    <a class="btn-getstarted" href="index.html#about">Get Started</a>
+    <div class="d-flex align-items-center gap-3">
+      <ng-container *ngIf="isLoggedIn; else guestActions">
+        <a routerLink="/profile" class="profile-link d-flex align-items-center">
+          <img *ngIf="imageUrl; else avatarFallback" [src]="imageUrl" alt="Photo de profil" class="profile-avatar" />
+          <ng-template #avatarFallback>
+            <span class="profile-avatar profile-avatar-fallback">{{ userInitial }}</span>
+          </ng-template>
+          <span class="profile-email">{{ email }}</span>
+        </a>
+        <a class="btn-getstarted" routerLink="/profile">Mon profil</a>
+        <button class="btn-getstarted btn-logout" type="button" (click)="logout()">Déconnexion</button>
+      </ng-container>
+      <ng-template #guestActions>
+        <a class="btn-getstarted" routerLink="/login">Get Started</a>
+      </ng-template>
+    </div>
 
   </div>
 </header>

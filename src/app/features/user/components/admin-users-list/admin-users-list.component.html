@@ -1,0 +1,60 @@
+<section class="contact section">
+  <div class="container section-title" data-aos="fade-up">
+    <span>Administration</span>
+    <h2>Utilisateurs</h2>
+    <p>Liste complète renvoyée par <code>GET /api/users</code>.</p>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="contact-form card">
+          <div class="card-body p-4 p-lg-5">
+            <div class="d-flex justify-content-end mb-4">
+              <a class="btn btn-submit" routerLink="/admin/users/new">Nouvel utilisateur</a>
+            </div>
+
+            <div *ngIf="errorMessage" class="error-message d-block">{{ errorMessage }}</div>
+            <div *ngIf="isLoading">Chargement des utilisateurs...</div>
+
+            <div *ngIf="!isLoading" class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>CIN</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of users; trackBy: trackByUserId">
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.lastName || '-' }}</td>
+                    <td>{{ user.firstName || '-' }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><span class="badge bg-secondary">{{ user.role }}</span></td>
+                    <td>{{ user.cin || '-' }}</td>
+                    <td class="text-end">
+                      <div class="d-inline-flex gap-2 flex-wrap justify-content-end">
+                        <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/admin/users', user.id]">Voir</a>
+                        <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/admin/users', user.id, 'edit']">Modifier</a>
+                        <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)">Supprimer</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!users.length">
+                    <td colspan="7" class="text-center py-4 text-secondary">Aucun utilisateur trouvé.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
