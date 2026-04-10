@@ -1,39 +1,136 @@
-<div class="portfolio-shell add-shell">
-  <div class="portfolio-card form-card">
-    <h1 class="portfolio-page-title small-title">Add Portfolio Project</h1>
-    <p class="portfolio-page-subtitle">
-      Add a new project to strengthen your professional portfolio.
-    </p>
+<div class="portfolio-page-container">
+  <div class="portfolio-content-container">
+    <div class="portfolio-shell add-shell">
+      <div class="add-project-layout">
+        <div class="add-project-content">
+          <span class="eyebrow">Professional Portfolio</span>
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="field">
-        <label>Title</label>
-        <input type="text" formControlName="title" placeholder="Ex: AI Job Recommendation System" />
+          <h1 class="portfolio-page-title hero-title">
+            Add a project that strengthens your profile
+          </h1>
+
+          <p class="portfolio-page-subtitle hero-subtitle">
+            Showcase an important project, highlight your role, the technologies you used,
+            and the results you achieved to make your portfolio stronger.
+          </p>
+
+          <div class="hero-points">
+            <div class="hero-point">
+              <span class="point-icon">✓</span>
+              <span>Highlight your achievements</span>
+            </div>
+            <div class="hero-point">
+              <span class="point-icon">✓</span>
+              <span>Add a demo or repository link</span>
+            </div>
+            <div class="hero-point">
+              <span class="point-icon">✓</span>
+              <span>Build a clear professional image</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-card form-card">
+          <h2 class="form-title">New Project</h2>
+          <p class="form-subtitle">
+            Fill in the information below.
+          </p>
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="field">
+              <label for="title">Title</label>
+              <input
+                id="title"
+                type="text"
+                formControlName="title"
+                placeholder="Ex: AI Job Recommendation System"
+              />
+
+              <div class="field-error" *ngIf="title?.touched && title?.invalid">
+                <small *ngIf="title?.errors?.['required']">
+                  Title is required.
+                </small>
+                <small *ngIf="title?.errors?.['minlength']">
+                  Title must be at least 5 characters long.
+                </small>
+                <small *ngIf="title?.errors?.['maxlength']">
+                  Title must not exceed 100 characters.
+                </small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                rows="6"
+                formControlName="description"
+                placeholder="Describe the project, your role, the technologies used, and the results achieved."
+              ></textarea>
+
+              <div class="field-error" *ngIf="description?.touched && description?.invalid">
+                <small *ngIf="description?.errors?.['required']">
+                  Description is required.
+                </small>
+                <small *ngIf="description?.errors?.['minlength']">
+                  Description must be at least 20 characters long.
+                </small>
+                <small *ngIf="description?.errors?.['maxlength']">
+                  Description must not exceed 1000 characters.
+                </small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="projectUrl">Project URL</label>
+              <input
+                id="projectUrl"
+                type="text"
+                formControlName="projectUrl"
+                placeholder="https://your-demo.com"
+              />
+
+              <div class="field-error" *ngIf="projectUrl?.touched && projectUrl?.invalid">
+                <small *ngIf="projectUrl?.errors?.['pattern']">
+                  Please enter a valid project URL starting with http:// or https://
+                </small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="repoUrl">Repository URL</label>
+              <input
+                id="repoUrl"
+                type="text"
+                formControlName="repoUrl"
+                placeholder="https://github.com/your-repo"
+              />
+
+              <div class="field-error" *ngIf="repoUrl?.touched && repoUrl?.invalid">
+                <small *ngIf="repoUrl?.errors?.['pattern']">
+                  Please enter a valid repository URL starting with http:// or https://
+                </small>
+              </div>
+            </div>
+
+            <div *ngIf="error" class="portfolio-error">{{ error }}</div>
+
+            <div class="actions">
+              <button
+                type="submit"
+                class="portfolio-btn portfolio-btn-primary"
+                [disabled]="loading"
+              >
+                {{ loading ? 'Saving...' : 'Create Project' }}
+              </button>
+
+              <a routerLink="/portfolio" class="portfolio-btn portfolio-btn-secondary">
+                Back
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <div class="field">
-        <label>Description</label>
-        <textarea rows="6" formControlName="description" placeholder="Describe the project, your role, technologies used, and results."></textarea>
-      </div>
-
-      <div class="field">
-        <label>Project URL</label>
-        <input type="text" formControlName="projectUrl" placeholder="https://your-demo.com" />
-      </div>
-
-      <div class="field">
-        <label>Repository URL</label>
-        <input type="text" formControlName="repoUrl" placeholder="https://github.com/your-repo" />
-      </div>
-
-      <div *ngIf="error" class="portfolio-error">{{ error }}</div>
-
-      <div class="actions">
-        <button type="submit" class="portfolio-btn portfolio-btn-primary" [disabled]="loading">
-          {{ loading ? 'Saving...' : 'Create Project' }}
-        </button>
-        <a routerLink="/portfolio" class="portfolio-btn portfolio-btn-secondary">Back</a>
-      </div>
-    </form>
+    </div>
   </div>
 </div>

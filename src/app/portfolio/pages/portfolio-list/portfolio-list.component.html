@@ -1,37 +1,345 @@
-<div class="portfolio-shell">
-  <h1 class="portfolio-page-title">My Portfolio</h1>
-  <p class="portfolio-page-subtitle">
-    Showcase your projects, demos, repositories, and professional work.
-  </p>
+<div class="portfolio-page-container">
+  <div class="portfolio-content-container">
+    <div class="portfolio-shell">
+      <div class="portfolio-page-header">
+        <div class="portfolio-header-text">
+          <p class="portfolio-eyebrow">Professional Portfolio</p>
+          <h1 class="portfolio-page-title">My Portfolio</h1>
+          <p class="portfolio-page-subtitle">
+            Showcase your projects, demos, repositories, and professional work.
+          </p>
+        </div>
 
-  <div class="top-actions">
-    <a routerLink="/portfolio/add" class="portfolio-btn portfolio-btn-primary">Add Project</a>
-    <a routerLink="/portfolio/analysis" class="portfolio-btn portfolio-btn-secondary">View Analysis</a>
-  </div>
-
-  <div *ngIf="loading" class="portfolio-empty">Loading portfolio projects...</div>
-  <div *ngIf="error" class="portfolio-error">{{ error }}</div>
-
-  <div *ngIf="!loading && !error && projects.length === 0" class="portfolio-empty">
-    No projects yet. Add your first portfolio project.
-  </div>
-
-  <div class="project-grid" *ngIf="!loading && !error && projects.length > 0">
-    <div class="portfolio-card project-card" *ngFor="let project of projects">
-      <div class="project-card-top">
-        <h3>{{ project.title }}</h3>
-        <span class="portfolio-badge">Media: {{ project.media.length }}</span>
+        <div class="top-actions">
+          <a routerLink="/portfolio/add" class="portfolio-btn portfolio-btn-primary">
+            Add Project
+          </a>
+          <a routerLink="/portfolio/analysis" class="portfolio-btn portfolio-btn-secondary">
+            View Analysis
+          </a>
+        </div>
       </div>
 
-      <p class="project-description">{{ project.description }}</p>
+      <div *ngIf="loading" class="state-card">
+        <div class="state-icon">⏳</div>
+        <div>
+          <h4>Loading projects</h4>
+          <p>Please wait while we load your portfolio projects.</p>
+        </div>
+      </div>
 
-      <div class="project-links">
-        <a *ngIf="project.projectUrl" [href]="project.projectUrl" target="_blank" class="project-link">
-          Live Demo
+      <div *ngIf="error" class="state-card error-card">
+        <div class="state-icon">⚠️</div>
+        <div>
+          <h4>Something went wrong</h4>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && !error && projects.length === 0" class="empty-state-card">
+        <div class="empty-icon">📁</div>
+        <h3>No projects yet</h3>
+        <p>
+          Your portfolio is still empty. Add your first project to start showcasing your work,
+          demos, repositories, and achievements.
+        </p>
+        <a routerLink="/portfolio/add" class="portfolio-btn portfolio-btn-primary">
+          Add Your First Project
         </a>
-        <a *ngIf="project.repoUrl" [href]="project.repoUrl" target="_blank" class="project-link">
-          Repository
-        </a>
+      </div>
+
+      <div class="project-grid" *ngIf="!loading && !error && projects.length > 0">
+        <div
+          class="portfolio-card project-card clickable-card"
+          *ngFor="let project of projects"
+          (click)="openProjectModal(project)"
+        >
+          <div class="project-card-top">
+            <div class="project-title-wrap">
+              <h3>{{ project.title }}</h3>
+              <span class="project-label">Portfolio Project</span>
+            </div>
+
+            <span class="portfolio-badge">
+              Media: {{ project.media?.length || 0 }}
+            </span>
+          </div>
+
+          <p class="project-description">{{ project.description }}</p>
+
+          <div class="project-links">
+            <a
+              *ngIf="project.projectUrl"
+              [href]="project.projectUrl"
+              target="_blank"
+              class="project-link primary-link"
+              (click)="$event.stopPropagation()"
+            >
+              View Project
+            </a>
+
+            <a
+              *ngIf="project.repoUrl"
+              [href]="project.repoUrl"
+              target="_blank"
+              class="project-link secondary-link"
+              (click)="$event.stopPropagation()"
+            >
+              Source Code
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="project-modal-backdrop"
+        *ngIf="selectedProject"
+        (click)="closeProjectModal()"
+      >
+        <div class="project-modal" (click)="$event.stopPropagation()">
+          <button class="modal-close-btn" (click)="closeProjectModal()">×</button>
+
+          <div class="modal-header">
+            <h2>{{ selectedProject.title }}</h2>
+            <span class="portfolio-badge">
+              Media: {{ selectedProject.media?.length || 0 }}
+            </span>
+          </div>
+
+          <p class="modal-description">{{ selectedProject.description }}</p>
+
+          <div class="modal-links">
+            <a
+              *ngIf="selectedProject.projectUrl"
+              [href]="selectedProject.projectUrl"
+              target="_blank"
+              class="project-link primary-link"
+            >
+              View Project
+            </a>
+
+            <a
+              *ngIf="selectedProject.repoUrl"
+              [href]="selectedProject.repoUrl"
+              target="_blank"
+              class="project-link secondary-link"
+            >
+              Source Code
+            </a>
+          </div>
+
+          <div class="project-actions-bar">
+            <button
+              type="button"
+              class="portfolio-btn portfolio-btn-secondary"
+              (click)="openEditProjectModal()"
+            >
+              Update Project
+            </button>
+
+            <button
+              type="button"
+              class="portfolio-btn portfolio-btn-danger"
+              (click)="deleteProject()"
+              [disabled]="deletingProject"
+            >
+              {{ deletingProject ? 'Deleting...' : 'Delete Project' }}
+            </button>
+          </div>
+
+          <div *ngIf="projectActionSuccess" class="upload-success">
+            {{ projectActionSuccess }}
+          </div>
+
+          <div *ngIf="projectActionError" class="upload-error">
+            {{ projectActionError }}
+          </div>
+
+          <div class="upload-section">
+            <div class="upload-section-header">
+              <h3>Upload an Image</h3>
+              <p>Select an image for this project, then click upload.</p>
+            </div>
+
+            <div class="upload-box">
+              <label for="projectImageUpload" class="custom-file-label">
+                <span class="upload-icon">📁</span>
+                <span>{{ selectedFile ? 'Change Image' : 'Choose Image' }}</span>
+              </label>
+
+              <input
+                id="projectImageUpload"
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                class="hidden-file-input"
+              />
+
+              <div class="selected-file-card" *ngIf="selectedFile">
+                <div class="selected-file-left">
+                  <span class="file-preview-icon">🖼️</span>
+                  <div>
+                    <div class="selected-file-title">Selected Image</div>
+                    <div class="selected-file-name">{{ selectedFile.name }}</div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="upload-now-btn"
+                  (click)="uploadMedia()"
+                  [disabled]="uploading"
+                >
+                  {{ uploading ? 'Uploading...' : 'Upload Image' }}
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="uploadError" class="upload-error">
+              {{ uploadError }}
+            </div>
+
+            <div *ngIf="uploadSuccess" class="upload-success">
+              {{ uploadSuccess }}
+            </div>
+          </div>
+
+          <div class="media-section">
+            <h3>Project Media</h3>
+
+            <div
+              *ngIf="!selectedProject.media || selectedProject.media.length === 0"
+              class="no-media"
+            >
+              No media available for this project.
+            </div>
+
+            <div
+              class="media-grid"
+              *ngIf="selectedProject.media && selectedProject.media.length > 0"
+            >
+              <div class="media-card" *ngFor="let media of selectedProject.media">
+                <button
+                  class="delete-media-btn"
+                  (click)="deleteMedia(media.id); $event.stopPropagation()"
+                >
+                  ×
+                </button>
+
+                <ng-container [ngSwitch]="media.type.toUpperCase()">
+                  <img
+                    *ngSwitchCase="'IMAGE'"
+                    [src]="getMediaUrl(media.mediaUrl)"
+                    alt="Project media"
+                    class="media-preview"
+                  />
+
+                  <video *ngSwitchCase="'VIDEO'" controls class="media-preview">
+                    <source [src]="getMediaUrl(media.mediaUrl)" />
+                  </video>
+
+                  <div *ngSwitchDefault class="file-preview">
+                    <a
+                      [href]="getMediaUrl(media.mediaUrl)"
+                      target="_blank"
+                      class="project-link secondary-link"
+                    >
+                      Open Media
+                    </a>
+                  </div>
+                </ng-container>
+
+                <div class="media-info">
+                  <span class="media-type">{{ media.type }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="project-modal-backdrop nested-backdrop"
+            *ngIf="isEditModalOpen"
+            (click)="closeEditProjectModal()"
+          >
+            <div class="project-modal edit-project-modal" (click)="$event.stopPropagation()">
+              <button class="modal-close-btn" (click)="closeEditProjectModal()">×</button>
+
+              <div class="modal-header">
+                <h2>Update Project</h2>
+              </div>
+
+              <div class="edit-form">
+                <div class="field">
+                  <label for="edit-title">Title</label>
+                  <input
+                    id="edit-title"
+                    type="text"
+                    [(ngModel)]="editProjectData.title"
+                    name="editTitle"
+                    placeholder="Project title"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="edit-description">Description</label>
+                  <textarea
+                    id="edit-description"
+                    rows="6"
+                    [(ngModel)]="editProjectData.description"
+                    name="editDescription"
+                    placeholder="Describe your project"
+                  ></textarea>
+                </div>
+
+                <div class="field">
+                  <label for="edit-project-url">Project URL</label>
+                  <input
+                    id="edit-project-url"
+                    type="text"
+                    [(ngModel)]="editProjectData.projectUrl"
+                    name="editProjectUrl"
+                    placeholder="https://your-demo.com"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="edit-repo-url">Repository URL</label>
+                  <input
+                    id="edit-repo-url"
+                    type="text"
+                    [(ngModel)]="editProjectData.repoUrl"
+                    name="editRepoUrl"
+                    placeholder="https://github.com/your-repo"
+                  />
+                </div>
+
+                <div *ngIf="projectActionError" class="upload-error">
+                  {{ projectActionError }}
+                </div>
+
+                <div class="edit-actions">
+                  <button
+                    type="button"
+                    class="portfolio-btn portfolio-btn-secondary"
+                    (click)="closeEditProjectModal()"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    class="portfolio-btn portfolio-btn-primary"
+                    (click)="saveProjectUpdates()"
+                    [disabled]="updatingProject"
+                  >
+                    {{ updatingProject ? 'Updating...' : 'Save Changes' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>

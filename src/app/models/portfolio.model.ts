@@ -24,7 +24,6 @@ export interface PortfolioAnalysisDetails {
   repoScore: number;
   liveUrlScore: number;
 }
-
 export interface PortfolioAnalysis {
   freelancerId: number;
   projectCount: number;
@@ -33,12 +32,25 @@ export interface PortfolioAnalysis {
   averageDescriptionLength: number;
   projectsWithRepoUrl: number;
   projectsWithLiveUrl: number;
+
+  averageRating: number;
+  totalReviews: number;
+  latestReviewComments: string[];
+
   score: number;
   level: string;
   suggestions: string[];
-  details: PortfolioAnalysisDetails;
+  details: ScoreDetails;
 }
 
+export interface ScoreDetails {
+  projectScore: number;
+  mediaScore: number;
+  descriptionScore: number;
+  repoScore: number;
+  liveUrlScore: number;
+  reviewScore: number;
+}
 export interface CreatePortfolioProjectRequest {
   title: string;
   description: string;

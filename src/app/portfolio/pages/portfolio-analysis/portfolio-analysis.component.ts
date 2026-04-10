@@ -15,22 +15,27 @@ export class PortfolioAnalysisComponent implements OnInit {
   loading = false;
   error = '';
 
+  // temporary demo values
+  freelancerId = 1;
+  username = 'zied';
+
+  constructor(private portfolioService: PortfolioService) {}
+
   ngOnInit(): void {
     this.loadAnalysis();
   }
-
-  constructor(private portfolioService: PortfolioService) {}
 
   loadAnalysis(): void {
     this.loading = true;
     this.error = '';
 
-    this.portfolioService.getAnalysis(1).subscribe({
+    this.portfolioService.getAnalysis(this.freelancerId, this.username).subscribe({
       next: (data) => {
         this.analysis = data;
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Portfolio analysis error:', err);
         this.error = 'Failed to load portfolio analysis.';
         this.loading = false;
       }
