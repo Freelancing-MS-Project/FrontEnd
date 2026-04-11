@@ -1,4 +1,7 @@
 export const API_BASE_URL = 'http://localhost:8090/ProjetMicroUseryahya';
+export const CHAT_API_BASE_URL = 'http://localhost:9091/api';
+export const CHAT_SOCKET_URL = 'http://localhost:9091';
+export const CHAT_SOCKET_PATH = '/socket.io';
 
 export const AUTH_STORAGE_KEYS = {
   token: 'user-service.token',

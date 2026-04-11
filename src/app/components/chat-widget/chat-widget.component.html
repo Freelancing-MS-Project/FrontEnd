@@ -1,0 +1,93 @@
+<div class="chat-widget" *ngIf="canShowWidget">
+  <section class="chat-panel" *ngIf="isOpen" aria-label="Chat">
+    <div class="chat-header">
+      <div>
+        <p>Chat</p>
+        <span>{{ selectedConversation ? getConversationLabel(selectedConversation) : 'Conversations' }}</span>
+      </div>
+      <button type="button" class="chat-close" aria-label="Fermer le chat" (click)="togglePanel()">x</button>
+    </div>
+
+    <div class="chat-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="chat-body" *ngIf="currentUser; else chatUnavailable">
+      <aside class="chat-conversations">
+        <p class="chat-section-title">Conversations</p>
+        <button
+          type="button"
+          class="chat-conversation"
+          *ngFor="let conversation of conversations; trackBy: trackByConversationId"
+          [class.active]="conversation._id === selectedConversation?._id"
+          (click)="selectConversation(conversation)">
+          <span>{{ getConversationLabel(conversation) }}</span>
+          <small>{{ conversation.lastMessage || 'Aucun message' }}</small>
+        </button>
+        <p class="chat-empty" *ngIf="!isLoading && conversations.length === 0">Aucune conversation.</p>
+
+        <p class="chat-section-title contacts-title">Contacts</p>
+        <button
+          type="button"
+          class="chat-conversation contact"
+          *ngFor="let user of getAvailableUsers(); trackBy: trackByUserId"
+          (click)="startConversation(user)">
+          <span>{{ getUserLabel(user) }}</span>
+          <small>{{ user.email || 'Démarrer' }}</small>
+        </button>
+      </aside>
+
+      <main class="chat-messages">
+        <ng-container *ngIf="selectedConversation; else noConversation">
+          <div class="messages-list">
+            <article
+              class="message-row"
+              *ngFor="let message of messages; trackBy: trackByMessageId"
+              [class.own]="isOwnMessage(message)">
+              <div class="message-bubble">
+                <ng-container *ngIf="editingMessageId === message._id; else readMessage">
+                  <textarea class="edit-input" [(ngModel)]="editingText" rows="2"></textarea>
+                  <div class="message-actions">
+                    <button type="button" (click)="saveEdit(message)">OK</button>
+                    <button type="button" (click)="cancelEdit()">Annuler</button>
+                  </div>
+                </ng-container>
+                <ng-template #readMessage>
+                  <p>{{ message.content }}</p>
+                  <small>{{ message.edited ? 'modifie' : '' }}</small>
+                  <div class="message-actions" *ngIf="canEdit(message)">
+                    <button type="button" (click)="beginEdit(message)">Modifier</button>
+                    <button type="button" (click)="deleteMessage(message)">Supprimer</button>
+                  </div>
+                </ng-template>
+              </div>
+            </article>
+            <p class="chat-empty" *ngIf="messages.length === 0">Aucun message.</p>
+          </div>
+
+          <form class="chat-input" (ngSubmit)="sendMessage()">
+            <input
+              type="text"
+              name="messageText"
+              [(ngModel)]="messageText"
+              placeholder="Ecrire un message"
+              autocomplete="off">
+            <button type="submit" [disabled]="!messageText.trim()">Envoyer</button>
+          </form>
+        </ng-container>
+
+        <ng-template #noConversation>
+          <div class="chat-placeholder">Choisissez une conversation.</div>
+        </ng-template>
+      </main>
+    </div>
+
+    <ng-template #chatUnavailable>
+      <div class="chat-unavailable">
+        <p>{{ errorMessage || 'Chat indisponible.' }}</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <button type="button" class="chat-fab" aria-label="Ouvrir le chat" (click)="togglePanel()">
+    <i class="bi bi-chat-dots"></i>
+  </button>
+</div>

@@ -18,7 +18,7 @@ export class PortfolioListComponent implements OnInit {
   error = '';
   selectedProject: PortfolioProject | null = null;
 
-  backendBaseUrl = 'http://localhost:9090';
+  backendBaseUrl = 'http://localhost:8085'; // Adjust if your backend runs on a different port or URL
 
   selectedFile: File | null = null;
   uploading = false;
