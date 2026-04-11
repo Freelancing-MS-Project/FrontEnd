@@ -10,7 +10,7 @@ import { Review } from '../models/review';
 export class ReviewService {
 
   // API Gateway URL
-  private baseUrl = 'http://localhost:8083/reviews';
+  private baseUrl = 'http://localhost:8093/reviews';
 
   constructor(private http: HttpClient) { }
 
