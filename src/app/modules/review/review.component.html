@@ -13,7 +13,6 @@
 <!-- ══ MAIN CONTENT ══ -->
 <div class="page" *ngIf="mission && !missionLoading">
 
-  <!-- ════════════════ MAIN COLUMN ════════════════ -->
   <div class="mission-main">
 
     <!-- ── Mission Overview Card ── -->
@@ -26,13 +25,12 @@
           <h1>{{ mission.title }}</h1>
           <div class="domain-tag">{{ getDomainLabel(mission.domain) }}</div>
         </div>
-       <span class="status-badge"
-      [class.status-closed]="mission.status === MissionStatus.Closed"
-      [class.status-open]="mission.status === MissionStatus.Open"
-      [class.status-archived]="mission.status === MissionStatus.Archived">
-  {{ getStatusLabel(mission.status) }}
-</span>
-
+        <span class="status-badge"
+          [class.status-closed]="mission.status === MissionStatus.Closed"
+          [class.status-open]="mission.status === MissionStatus.Open"
+          [class.status-archived]="mission.status === MissionStatus.Archived">
+          {{ getStatusLabel(mission.status) }}
+        </span>
       </div>
 
       <div class="meta-row">
@@ -68,40 +66,33 @@
     <div class="card reviews-card">
       <h2><i class="bi bi-chat-heart-fill"></i> Évaluations & Avis</h2>
 
-      <!-- Loading reviews -->
       <div class="reviews-loading" *ngIf="reviewsLoading">
         <div class="spinner spinner-sm"></div>
         <span>Chargement des avis…</span>
       </div>
 
-      <!-- Success and Error Banners -->
       <div class="success-banner" *ngIf="submitSuccess">
         <i class="bi bi-check-circle-fill"></i> Votre avis a été publié avec succès !
       </div>
-
       <div class="error-banner" *ngIf="submitError">
         <i class="bi bi-x-circle-fill"></i> {{ submitError }}
       </div>
-
       <div class="success-banner" *ngIf="updateSuccess">
         <i class="bi bi-check-circle-fill"></i> Votre avis a été modifié avec succès !
       </div>
-
       <div class="error-banner" *ngIf="updateError">
         <i class="bi bi-x-circle-fill"></i> {{ updateError }}
       </div>
-
       <div class="success-banner" *ngIf="deleteSuccess">
         <i class="bi bi-check-circle-fill"></i> Votre avis a été supprimé avec succès !
       </div>
-
       <div class="error-banner" *ngIf="deleteError">
         <i class="bi bi-x-circle-fill"></i> {{ deleteError }}
       </div>
 
       <ng-container *ngIf="!reviewsLoading">
 
-        <!-- ── Rating Summary ── -->
+        <!-- ── Rating Summary (tous les reviews) ── -->
         <div class="rating-summary" *ngIf="reviews.length > 0">
           <div class="rating-big">
             <div class="score">{{ averageRating }}</div>
@@ -128,24 +119,24 @@
         </div>
 
         <!-- ── Empty state ── -->
-        <div class="empty-reviews" *ngIf="reviews.length === 0">
+        <div class="empty-reviews" *ngIf="myReviews.length === 0">
           <i class="bi bi-chat-square-dots"></i>
-          <p>Aucun avis pour cette mission. Soyez le premier à laisser un avis !</p>
+          <p>Vous n'avez pas encore laissé d'avis pour cette mission.</p>
         </div>
 
-        <!-- ── Thread ── -->
-        <div class="thread" *ngIf="reviews.length > 0">
+        <!-- ── Thread : uniquement les reviews du connecté ── -->
+        <div class="thread" *ngIf="myReviews.length > 0">
           <div class="message"
-               *ngFor="let review of reviews; let i = index"
+               *ngFor="let review of myReviews; let i = index"
                [style.animation-delay]="(i * 0.08 + 0.05) + 's'">
 
-            <div class="avatar" [style.background]="getAvatarColor(review.fromUser)">
-              {{ getInitials(review.fromUser) }}
+            <div class="avatar" [style.background]="getAvatarColor(fromUser)">
+              {{ getInitials(fromUser) }}
             </div>
 
             <div class="bubble-wrap">
               <div class="bubble-meta">
-                <span class="name">{{ review.fromUser }}</span>
+                <span class="name">{{ getDisplayName() }}</span>
                 <span class="time">
                   {{ formatDate(review.createdAt) }}
                   <span *ngIf="isEdited(review)" class="edited-badge">
@@ -158,8 +149,7 @@
                         [class.star-half]="s === 'half'"
                         [class.star-empty]="s === 'empty'">★</span>
                 </span>
-                <!-- Actions (only own reviews) -->
-                <div class="review-actions" *ngIf="isOwnReview(review)">
+                <div class="review-actions">
                   <button class="action-btn edit-btn"
                           (click)="startEdit(review)"
                           title="Modifier">
@@ -173,10 +163,8 @@
                 </div>
               </div>
 
-              <!-- Normal view -->
               <ng-container *ngIf="editingReview?.id !== review.id">
                 <div class="bubble">{{ review.comment }}</div>
-                <!-- Delete confirm inline -->
                 <div class="delete-confirm" *ngIf="deletingId === review.id">
                   <i class="bi bi-exclamation-triangle-fill"></i>
                   <span>Confirmer la suppression ?</span>
@@ -185,7 +173,6 @@
                 </div>
               </ng-container>
 
-              <!-- Edit form inline -->
               <div class="edit-form" *ngIf="editingReview?.id === review.id">
                 <div class="edit-stars" (mouseleave)="clearEditHover()">
                   <span *ngFor="let i of [5,4,3,2,1]"
@@ -212,139 +199,156 @@
           </div>
         </div>
 
-       <!-- ── Compose Box ── -->
-<div class="compose-box">
+        <!-- ── Compose Box ── -->
+        <div class="compose-box">
 
-  <!-- Mood selector -->
-  <div class="compose-header">
-    <div class="avatar compose-avatar" [style.background]="getAvatarColor(fromUser)">
-      {{ getInitials(fromUser) }}
-    </div>
-    <span class="compose-label">Laisser un avis</span>
-    <div class="mood-selector">
-      <div class="mood-pill"
-           *ngFor="let mood of moods"
-           [class.selected]="selectedMood === mood.key"
-           (click)="selectMood(mood)">
-        <span class="m-emoji">{{ mood.emoji }}</span>
-        <span>{{ mood.label }}</span>
-      </div>
-    </div>
-  </div>
+          <div class="compose-header">
+            <div class="avatar compose-avatar" [style.background]="getAvatarColor(fromUser)">
+              {{ getInitials(fromUser) }}
+            </div>
+            <span class="compose-label">{{ getDisplayName() }}</span>
+            <div class="mood-selector">
+              <div class="mood-pill"
+                   *ngFor="let mood of moods"
+                   [class.selected]="selectedMood === mood.key"
+                   (click)="selectMood(mood)">
+                <span class="m-emoji">{{ mood.emoji }}</span>
+                <span>{{ mood.label }}</span>
+              </div>
+            </div>
+          </div>
 
-  <!-- Mood banner -->
-  <div class="mood-banner"
-       *ngIf="getMoodBanner() as banner"
-       [style.background]="banner.color"
-       [style.border-color]="banner.border"
-       [style.color]="banner.textColor">
-    <span class="mood-banner-emoji">{{ banner.emoji }}</span>
-    {{ banner.text }}
-  </div>
+          <div class="mood-banner"
+               *ngIf="getMoodBanner() as banner"
+               [style.background]="banner.color"
+               [style.border-color]="banner.border"
+               [style.color]="banner.textColor">
+            <span class="mood-banner-emoji">{{ banner.emoji }}</span>
+            {{ banner.text }}
+          </div>
 
-  <!-- Star row -->
-  <div class="star-row">
-    <span class="star-row-label">Note :</span>
-    <div class="stars-wrap" (mouseleave)="clearHover()">
-      <span *ngFor="let i of [1,2,3,4,5]"
-            class="star-btn"
-            [class.active]="getDisplayRating() >= i"
-            (mouseenter)="setHover(i)"
-            (click)="setRating(i)">★</span>
-    </div>
-    <span class="star-hint"
-          *ngIf="selectedRating > 0"
-          [style.color]="getStarHintColor()">
-      {{ starHints[selectedRating] }}
-    </span>
-    <span class="star-hint muted" *ngIf="selectedRating === 0">Choisissez une note</span>
-  </div>
+          <div class="star-row">
+            <span class="star-row-label">Note :</span>
+            <div class="stars-wrap" (mouseleave)="clearHover()">
+              <span *ngFor="let i of [1,2,3,4,5]"
+                    class="star-btn"
+                    [class.active]="getDisplayRating() >= i"
+                    (mouseenter)="setHover(i)"
+                    (click)="setRating(i)">★</span>
+            </div>
+            <span class="star-hint"
+                  *ngIf="selectedRating > 0"
+                  [style.color]="getStarHintColor()">
+              {{ starHints[selectedRating] }}
+            </span>
+            <span class="star-hint muted" *ngIf="selectedRating === 0">Choisissez une note</span>
+          </div>
 
-  <!-- Textarea + emoji toggle -->
-  <div class="textarea-wrap">
-    <textarea
-      #reviewTextarea
-      class="compose-textarea"
-      placeholder="Partagez votre expérience avec cette mission…"
-      rows="4"
-      [(ngModel)]="reviewComment"
-      maxlength="500">
-    </textarea>
-    <button class="emoji-toggle-btn"
-            [class.active]="showEmojiPicker"
-            (click)="toggleEmojiPicker()"
-            title="Insérer un emoji"
-            type="button">
-      😊
-    </button>
-    <span class="char-count"
-          [class.over]="reviewComment.length > 450">
-      {{ reviewComment.length }} / 500
-    </span>
-  </div>
+          <!-- ── Textarea + emoji toggle ── -->
+          <div class="textarea-wrap">
+            <textarea
+              #reviewTextarea
+              class="compose-textarea"
+              placeholder="Partagez votre expérience avec cette mission…"
+              rows="4"
+              [(ngModel)]="reviewComment"
+              maxlength="500"
+              (input)="onReviewInput()"
+              (keydown)="onTextareaKeydown($event)">
+            </textarea>
+            <button class="emoji-toggle-btn"
+                    [class.active]="showEmojiPicker"
+                    (click)="toggleEmojiPicker()"
+                    title="Insérer un emoji"
+                    type="button">
+              😊
+            </button>
+            <span class="char-count"
+                  [class.over]="reviewComment.length > 450">
+              {{ reviewComment.length }} / 500
+            </span>
+          </div>
 
-  <!-- Emoji picker panel -->
-  <div class="emoji-panel" *ngIf="showEmojiPicker">
-    <div class="ep-tabs">
-      <button *ngFor="let cat of emojiCategories | keyvalue"
-              class="ep-tab"
-              [class.active]="activeEmojiCategory === cat.key"
-              (click)="activeEmojiCategory = cat.key; emojiSearchQuery = ''"
-              type="button">
-        {{ cat.value.icon }}
-      </button>
-    </div>
-    <input class="ep-search"
-           [(ngModel)]="emojiSearchQuery"
-           placeholder="Rechercher un emoji…" />
-    <div class="ep-grid">
-      <button *ngFor="let em of getVisibleEmojis()"
-              class="ep-btn"
-              (click)="insertEmoji(em, reviewTextarea)"
-              type="button">
-        {{ em }}
-      </button>
-      <span *ngIf="getVisibleEmojis().length === 0" class="ep-empty">
-        Aucun résultat
-      </span>
-    </div>
-  </div>
+          <!-- ── Bulle de suggestion IA ── -->
+          <div class="ai-suggestion-box" *ngIf="aiSuggestion || aiLoading">
 
-  <!-- Recent emojis row -->
-  <div class="recent-row" *ngIf="recentEmojis.length > 0 && !showEmojiPicker">
-    <span class="recent-label">Récents :</span>
-    <button *ngFor="let em of recentEmojis.slice(0,6)"
-            class="recent-item"
-            (click)="insertEmoji(em, reviewTextarea)"
-            type="button">
-      {{ em }}
-    </button>
-  </div>
+            <div class="ai-suggestion-loading" *ngIf="aiLoading && !aiSuggestion">
+              <span class="ai-dot"></span>
+              <span class="ai-dot"></span>
+              <span class="ai-dot"></span>
+              <span class="ai-label">IA en train d'écrire…</span>
+            </div>
 
-  <!-- Footer -->
-  <div class="compose-actions">
-    <span class="markdown-hint">Markdown supporté</span>
-    <button class="btn-primary"
-            [disabled]="!selectedRating || !reviewComment.trim() || submitting"
-            (click)="submitReview()">
-      <span class="spinner-inline" *ngIf="submitting"></span>
-      <i class="bi bi-send-fill" *ngIf="!submitting"></i>
-      {{ submitting ? 'Publication…' : 'Publier l\'avis' }}
-    </button>
-  </div>
+            <div class="ai-suggestion-content" *ngIf="aiSuggestion">
+              <span class="ai-icon">✨</span>
+              <span class="ai-text">{{ aiSuggestion }}</span>
+              <div class="ai-actions">
+                <kbd class="ai-kbd">Tab</kbd>
+                <span class="ai-hint">pour accepter</span>
+                <kbd class="ai-kbd">Esc</kbd>
+                <span class="ai-hint">pour ignorer</span>
+              </div>
+            </div>
 
-</div>
+          </div>
+
+          <!-- Emoji picker panel -->
+          <div class="emoji-panel" *ngIf="showEmojiPicker">
+            <div class="ep-tabs">
+              <button *ngFor="let cat of emojiCategories | keyvalue"
+                      class="ep-tab"
+                      [class.active]="activeEmojiCategory === cat.key"
+                      (click)="activeEmojiCategory = cat.key; emojiSearchQuery = ''"
+                      type="button">
+                {{ cat.value.icon }}
+              </button>
+            </div>
+            <input class="ep-search"
+                   [(ngModel)]="emojiSearchQuery"
+                   placeholder="Rechercher un emoji…" />
+            <div class="ep-grid">
+              <button *ngFor="let em of getVisibleEmojis()"
+                      class="ep-btn"
+                      (click)="insertEmoji(em, reviewTextarea)"
+                      type="button">
+                {{ em }}
+              </button>
+              <span *ngIf="getVisibleEmojis().length === 0" class="ep-empty">
+                Aucun résultat
+              </span>
+            </div>
+          </div>
+
+          <div class="recent-row" *ngIf="recentEmojis.length > 0 && !showEmojiPicker">
+            <span class="recent-label">Récents :</span>
+            <button *ngFor="let em of recentEmojis.slice(0,6)"
+                    class="recent-item"
+                    (click)="insertEmoji(em, reviewTextarea)"
+                    type="button">
+              {{ em }}
+            </button>
+          </div>
+
+          <div class="compose-actions">
+            <span class="markdown-hint">Markdown supporté</span>
+            <button class="btn-primary"
+                    [disabled]="!selectedRating || !reviewComment.trim() || submitting"
+                    (click)="submitReview()">
+              <span class="spinner-inline" *ngIf="submitting"></span>
+              <i class="bi bi-send-fill" *ngIf="!submitting"></i>
+              {{ submitting ? 'Publication…' : 'Publier l\'avis' }}
+            </button>
+          </div>
+
+        </div>
       </ng-container>
     </div>
-    <!-- end reviews-card -->
 
   </div>
-  <!-- end mission-main -->
 
   <!-- ════════════════ SIDEBAR ════════════════ -->
   <div class="sidebar">
 
-    <!-- Mission Details -->
     <div class="card sidebar-card">
       <h3>Détails de la mission</h3>
       <div class="info-list">
@@ -363,12 +367,12 @@
         <div class="info-row">
           <span class="label">Statut</span>
           <span class="value">
-           <span class="status-badge status-sm"
-      [class.status-closed]="mission.status === MissionStatus.Closed"
-      [class.status-open]="mission.status === MissionStatus.Open"
-      [class.status-archived]="mission.status === MissionStatus.Archived">
-  {{ getStatusLabel(mission.status) }}
-</span>
+            <span class="status-badge status-sm"
+              [class.status-closed]="mission.status === MissionStatus.Closed"
+              [class.status-open]="mission.status === MissionStatus.Open"
+              [class.status-archived]="mission.status === MissionStatus.Archived">
+              {{ getStatusLabel(mission.status) }}
+            </span>
           </span>
         </div>
         <div class="info-row">
@@ -382,7 +386,6 @@
       </div>
     </div>
 
-    <!-- Review Stats -->
     <div class="card sidebar-card" *ngIf="reviews.length > 0">
       <h3>Résumé des avis</h3>
       <div class="info-list">
@@ -401,13 +404,12 @@
       </div>
     </div>
 
-    <!-- CTA -->
     <button class="btn-apply"
         [disabled]="mission.status === MissionStatus.Closed"
         [class.btn-disabled]="mission.status === MissionStatus.Closed">
-  <i [class]="mission.status === MissionStatus.Closed ? 'bi bi-lock-fill' : 'bi bi-send-fill'"></i>
-  {{ mission.status === MissionStatus.Closed ? 'Mission fermée' : 'Postuler à la mission' }}
-</button>
+      <i [class]="mission.status === MissionStatus.Closed ? 'bi bi-lock-fill' : 'bi bi-send-fill'"></i>
+      {{ mission.status === MissionStatus.Closed ? 'Mission fermée' : 'Postuler à la mission' }}
+    </button>
 
   </div>
 

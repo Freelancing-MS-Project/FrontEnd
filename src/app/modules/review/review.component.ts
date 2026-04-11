@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { MissionStatus } from '../../models/mission-status';
 import { Review } from '../../models/review';
 import { ReviewService } from '../../services/review.service';
 import { MissionService } from '../../services/mission.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface RatingDistribution {
   stars: number;
@@ -19,7 +20,7 @@ interface RatingDistribution {
   templateUrl: './review.component.html',
   styleUrl: './review.component.css',
 })
-export class ReviewComponent implements OnInit {
+export class ReviewComponent implements OnInit, OnDestroy {
 
   // ── Mission ──
   mission: Mission | null = null;
@@ -27,7 +28,6 @@ export class ReviewComponent implements OnInit {
   missionError: string | null = null;
   missionId!: number;
 
-  // Expose enum to template
   MissionStatus = MissionStatus;
 
   // ── Reviews ──
@@ -40,8 +40,9 @@ export class ReviewComponent implements OnInit {
   selectedRating = 0;
   hoveredRating = 0;
   reviewComment = '';
-  fromUser = 'publisherUser'; // replace with your auth service value
-  toUser = '';                   // set from mission.clientId or resolved user
+  fromUser = '';
+  fromUserId!: number;
+  toUser = '';
   submitting = false;
   submitSuccess = false;
   submitError: string | null = null;
@@ -59,16 +60,39 @@ export class ReviewComponent implements OnInit {
   deleteSuccess = false;
   deleteError: string | null = null;
 
+  // ── Autocomplete WS ──
+  private ws: WebSocket | null = null;
+  private wsDebounce: any = null;
+  aiSuggestion = '';
+  aiLoading = false;
+  private readonly WS_URL = 'ws://localhost:8093/ws/autocomplete';
+
   constructor(
     private route: ActivatedRoute,
     private reviewService: ReviewService,
-    private missionService: MissionService
+    private missionService: MissionService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.missionId = Number(this.route.snapshot.paramMap.get('id'));
+    this.missionId  = Number(this.route.snapshot.paramMap.get('id'));
+    this.fromUser   = this.authService.getEmail() ?? 'Utilisateur';
+    this.fromUserId = this.authService.getUserId() ?? 0;
     this.loadMission();
     this.loadReviews();
+  }
+
+  ngOnDestroy(): void {
+    this.ws?.close();
+    clearTimeout(this.wsDebounce);
+  }
+
+  // ══════════════════════════════════════════
+  //  REVIEWS FILTRÉS (uniquement le connecté)
+  // ══════════════════════════════════════════
+
+  get myReviews(): Review[] {
+    return this.reviews.filter(r => r.fromUser === String(this.fromUserId));
   }
 
   // ══════════════════════════════════════════
@@ -79,8 +103,8 @@ export class ReviewComponent implements OnInit {
     this.missionLoading = true;
     this.missionService.getMissionById(this.missionId).subscribe({
       next: (m) => {
-        this.mission = m;
-        this.toUser = String(m.clientId);
+        this.mission  = m;
+        this.toUser   = String(m.clientId);
         this.missionLoading = false;
       },
       error: () => {
@@ -109,7 +133,7 @@ export class ReviewComponent implements OnInit {
   }
 
   // ══════════════════════════════════════════
-  //  STATS
+  //  STATS (basées sur TOUS les reviews)
   // ══════════════════════════════════════════
 
   private computeStats(): void {
@@ -136,6 +160,74 @@ export class ReviewComponent implements OnInit {
   }
 
   // ══════════════════════════════════════════
+  //  AUTOCOMPLETE WEBSOCKET
+  // ══════════════════════════════════════════
+
+  private connectWs(): void {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
+    this.ws = new WebSocket(this.WS_URL);
+
+    this.ws.onmessage = (event) => {
+      const token = event.data;
+      if (token === '[DONE]') {
+        this.aiLoading = false;
+        return;
+      }
+      if (token === '[ERROR]') {
+        this.aiSuggestion = '';
+        this.aiLoading    = false;
+        return;
+      }
+      this.aiSuggestion += token;
+    };
+
+    this.ws.onerror = () => {
+      this.aiSuggestion = '';
+      this.aiLoading    = false;
+    };
+  }
+
+  onReviewInput(): void {
+    const text = this.reviewComment.trim();
+    this.aiSuggestion = '';
+
+    clearTimeout(this.wsDebounce);
+
+    if (text.length < 4) return;
+
+    this.wsDebounce = setTimeout(() => {
+      this.aiLoading = true;
+      this.connectWs();
+
+      if (this.ws!.readyState === WebSocket.OPEN) {
+        this.ws!.send(text);
+      } else {
+        this.ws!.onopen = () => this.ws!.send(text);
+      }
+    }, 600);
+  }
+
+  acceptSuggestion(): void {
+    if (!this.aiSuggestion) return;
+    this.reviewComment = this.reviewComment.trimEnd() + ' ' + this.aiSuggestion.trim();
+    this.aiSuggestion  = '';
+  }
+
+  dismissSuggestion(): void {
+    this.aiSuggestion = '';
+  }
+
+  onTextareaKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && this.aiSuggestion) {
+      event.preventDefault();
+      this.acceptSuggestion();
+    }
+    if (event.key === 'Escape') {
+      this.dismissSuggestion();
+    }
+  }
+
+  // ══════════════════════════════════════════
   //  CREATE
   // ══════════════════════════════════════════
 
@@ -143,30 +235,33 @@ export class ReviewComponent implements OnInit {
     if (!this.selectedRating || !this.reviewComment.trim()) return;
     this.submitting = true;
     this.submitError = null;
+    this.aiSuggestion = '';
 
     const newReview: Review = {
-      missionId: this.missionId,
-      fromUser: this.fromUser,
-      toUser: this.toUser,
-      rating: this.selectedRating,
-      comment: this.reviewComment.trim()
+      missionId : this.missionId,
+      fromUser  : String(this.fromUserId),
+      toUser    : this.toUser,
+      rating    : this.selectedRating,
+      comment   : this.reviewComment.trim()
     };
 
     this.reviewService.createReview(newReview).subscribe({
       next: (created) => {
-        this.reviews = [created, ...this.reviews];
+        const displayReview: Review = { ...created, fromUser: String(this.fromUserId) };
+        this.reviews = [displayReview, ...this.reviews];
         this.computeStats();
         this.selectedRating = 0;
-        this.reviewComment = '';
-        this.submitting = false;
-        this.submitSuccess = true;
+        this.reviewComment  = '';
+        this.selectedMood   = null;
+        this.submitting     = false;
+        this.submitSuccess  = true;
         setTimeout(() => this.submitSuccess = false, 3000);
         setTimeout(() => this.animateBars(), 100);
       },
       error: (error) => {
         console.error('Erreur lors de la création:', error);
         this.submitError = 'Erreur lors de la publication. Veuillez réessayer.';
-        this.submitting = false;
+        this.submitting  = false;
         setTimeout(() => this.submitError = null, 3000);
       }
     });
@@ -177,7 +272,6 @@ export class ReviewComponent implements OnInit {
   // ══════════════════════════════════════════
 
   startEdit(review: Review): void {
-    // Annuler toute édition en cours
     if (this.editingReview) {
       if (confirm('Vous avez une modification en cours. Voulez-vous l\'annuler ?')) {
         this.cancelEdit();
@@ -185,19 +279,18 @@ export class ReviewComponent implements OnInit {
         return;
       }
     }
-
     this.editingReview = { ...review };
-    this.editComment = review.comment;
-    this.editRating = review.rating;
-    this.editHovered = 0;
-    this.updateError = null;
+    this.editComment   = review.comment;
+    this.editRating    = review.rating;
+    this.editHovered   = 0;
+    this.updateError   = null;
   }
 
   cancelEdit(): void {
     this.editingReview = null;
-    this.editComment = '';
-    this.editRating = 0;
-    this.updateError = null;
+    this.editComment   = '';
+    this.editRating    = 0;
+    this.updateError   = null;
   }
 
   saveEdit(): void {
@@ -205,14 +298,14 @@ export class ReviewComponent implements OnInit {
 
     const updated: Review = {
       ...this.editingReview,
-      rating: this.editRating,
+      rating : this.editRating,
       comment: this.editComment.trim()
     };
 
     this.reviewService.updateReview(this.editingReview.id, updated).subscribe({
       next: (saved) => {
         const idx = this.reviews.findIndex(r => r.id === saved.id);
-        if (idx !== -1) this.reviews[idx] = saved;
+        if (idx !== -1) this.reviews[idx] = { ...saved, fromUser: String(this.fromUserId) };
         this.computeStats();
         this.cancelEdit();
         this.updateSuccess = true;
@@ -232,21 +325,21 @@ export class ReviewComponent implements OnInit {
   // ══════════════════════════════════════════
 
   confirmDelete(id: number): void {
-    this.deletingId = id;
+    this.deletingId  = id;
     this.deleteError = null;
   }
 
   cancelDelete(): void {
-    this.deletingId = null;
+    this.deletingId  = null;
     this.deleteError = null;
   }
 
   deleteReview(id: number): void {
     this.reviewService.deleteReview(id).subscribe({
       next: () => {
-        this.reviews = this.reviews.filter(r => r.id !== id);
+        this.reviews    = this.reviews.filter(r => r.id !== id);
         this.computeStats();
-        this.deletingId = null;
+        this.deletingId    = null;
         this.deleteSuccess = true;
         setTimeout(() => this.deleteSuccess = false, 3000);
         setTimeout(() => this.animateBars(), 100);
@@ -267,51 +360,55 @@ export class ReviewComponent implements OnInit {
   getStarArray(rating: number): string[] {
     return Array.from({ length: 5 }, (_, i) => {
       if (i < Math.floor(rating)) return 'full';
-      if (i < rating) return 'half';
+      if (i < rating)             return 'half';
       return 'empty';
     });
   }
 
-  setRating(r: number): void { this.selectedRating = r; }
-  setHover(r: number): void { this.hoveredRating = r; }
-  clearHover(): void { this.hoveredRating = 0; }
-  getDisplayRating(): number { return this.hoveredRating || this.selectedRating; }
+  setRating(r: number): void   { this.selectedRating = r; }
+  setHover(r: number): void    { this.hoveredRating = r; }
+  clearHover(): void           { this.hoveredRating = 0; }
+  getDisplayRating(): number   { return this.hoveredRating || this.selectedRating; }
 
-  setEditRating(r: number): void { this.editRating = r; }
-  setEditHover(r: number): void { this.editHovered = r; }
-  clearEditHover(): void { this.editHovered = 0; }
-  getEditDisplayRating(): number { return this.editHovered || this.editRating; }
+  setEditRating(r: number): void  { this.editRating = r; }
+  setEditHover(r: number): void   { this.editHovered = r; }
+  clearEditHover(): void          { this.editHovered = 0; }
+  getEditDisplayRating(): number  { return this.editHovered || this.editRating; }
+
+  getDisplayName(): string {
+    return this.fromUser.split('@')[0];
+  }
 
   getDomainLabel(domain: string): string {
     const map: Record<string, string> = {
       WEB_DEVELOPMENT: 'Développement Web',
-      MOBILE: 'Mobile',
-      DATA_SCIENCE: 'Data Science',
-      DEVOPS: 'DevOps',
-      DESIGN: 'Design',
-      OTHER: 'Autre'
+      MOBILE         : 'Mobile',
+      DATA_SCIENCE   : 'Data Science',
+      DEVOPS         : 'DevOps',
+      DESIGN         : 'Design',
+      OTHER          : 'Autre'
     };
     return map[domain] || domain;
   }
 
   getStatusLabel(status: MissionStatus): string {
     const map: Record<MissionStatus, string> = {
-      [MissionStatus.Open]:     'OUVERTE',
-      [MissionStatus.Closed]:   'FERMÉE',
+      [MissionStatus.Open]    : 'OUVERTE',
+      [MissionStatus.Closed]  : 'FERMÉE',
       [MissionStatus.Archived]: 'ARCHIVÉE'
     };
     return map[status] ?? status;
   }
 
   isOwnReview(review: Review): boolean {
-    return review.fromUser === this.fromUser;
+    return review.fromUser === String(this.fromUserId);
   }
 
   formatDate(dateStr?: string): string {
     if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
+    const d       = new Date(dateStr);
+    const now     = new Date();
+    const diff    = now.getTime() - d.getTime();
     const minutes = Math.floor(diff / 60000);
     if (minutes < 60) return `il y a ${minutes} min`;
     const hours = Math.floor(minutes / 60);
@@ -345,84 +442,83 @@ export class ReviewComponent implements OnInit {
     return review.updatedAt !== review.createdAt && review.updatedAt != null;
   }
 
-
   // ── Mood ──
-readonly moods = [
-  { key: 'great', emoji: '🤩', label: 'Excellent', text: 'Excellente expérience !', stars: 5, color: '#e6f2ef', border: '#c8e4de', textColor: '#1a6b5a' },
-  { key: 'good',  emoji: '😊', label: 'Bien',      text: 'Bonne collaboration globale.', stars: 4, color: '#fdf7e6', border: '#f0dfa0', textColor: '#8a6a00' },
-  { key: 'ok',    emoji: '😐', label: 'Moyen',     text: 'Expérience correcte, quelques points à améliorer.', stars: 3, color: '#f9f8f5', border: '#e8e5dc', textColor: '#7a7869' },
-  { key: 'bad',   emoji: '😕', label: 'Déçu',      text: 'Expérience décevante sur plusieurs points.', stars: 2, color: '#fdeaea', border: '#f5c6c6', textColor: '#e85d5d' },
-];
-selectedMood: string | null = null;
+  readonly moods = [
+    { key: 'great', emoji: '🤩', label: 'Excellent', text: 'Excellente expérience !',                           stars: 5, color: '#e6f2ef', border: '#c8e4de', textColor: '#1a6b5a' },
+    { key: 'good',  emoji: '😊', label: 'Bien',      text: 'Bonne collaboration globale.',                      stars: 4, color: '#fdf7e6', border: '#f0dfa0', textColor: '#8a6a00' },
+    { key: 'ok',    emoji: '😐', label: 'Moyen',     text: 'Expérience correcte, quelques points à améliorer.', stars: 3, color: '#f9f8f5', border: '#e8e5dc', textColor: '#7a7869' },
+    { key: 'bad',   emoji: '😕', label: 'Déçu',      text: 'Expérience décevante sur plusieurs points.',        stars: 2, color: '#fdeaea', border: '#f5c6c6', textColor: '#e85d5d' },
+  ];
+  selectedMood: string | null = null;
 
-selectMood(mood: typeof this.moods[0]): void {
-  if (this.selectedMood === mood.key) {
-    this.selectedMood = null;
-    return;
+  selectMood(mood: typeof this.moods[0]): void {
+    if (this.selectedMood === mood.key) {
+      this.selectedMood = null;
+      return;
+    }
+    this.selectedMood = mood.key;
+    if (!this.reviewComment.trim()) {
+      this.reviewComment = mood.text + ' ';
+    }
+    this.setRating(mood.stars);
   }
-  this.selectedMood = mood.key;
-  if (!this.reviewComment.trim()) {
-    this.reviewComment = mood.text + ' ';
+
+  getMoodBanner() {
+    return this.moods.find(m => m.key === this.selectedMood) ?? null;
   }
-  this.setRating(mood.stars);
-}
 
-getMoodBanner() {
-  return this.moods.find(m => m.key === this.selectedMood) ?? null;
-}
+  // ── Emoji picker ──
+  showEmojiPicker     = false;
+  emojiSearchQuery    = '';
+  activeEmojiCategory = 'faces';
+  recentEmojis: string[] = [];
 
-// ── Emoji picker ──
-showEmojiPicker = false;
-emojiSearchQuery = '';
-activeEmojiCategory = 'faces';
-recentEmojis: string[] = [];
+  readonly emojiCategories: Record<string, { icon: string; emojis: string[] }> = {
+    recent  : { icon: '🕐', emojis: [] },
+    faces   : { icon: '😀', emojis: ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','😈','👿'] },
+    gestures: { icon: '👍', emojis: ['👍','👎','👏','🙌','👐','🤲','🤝','🙏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','✋','🤚','🖐','🖖','💪','🦾','✍️','🤳','💅','🫶','🫵'] },
+    objects : { icon: '💼', emojis: ['💼','📋','📌','📎','🗂️','🗃️','💡','🔧','⚙️','🛠️','🔑','🏆','🥇','🎯','🎖️','📊','📈','📉','💰','💵','💳','🖥️','💻','📱','⌨️','🖱️','📡','🔬','📝','📖'] },
+    symbols : { icon: '✨', emojis: ['✅','❌','⚠️','🔴','🟠','🟡','🟢','🔵','🟣','⭐','🌟','💫','✨','🔥','❤️','🧡','💛','💚','💙','💜','🖤','🤍','❗','❓','💯','🎉','🎊','🚀','🌈','🔔'] },
+  };
 
-readonly emojiCategories: Record<string, { icon: string; emojis: string[] }> = {
-  recent:   { icon: '🕐', emojis: [] },
-  faces:    { icon: '😀', emojis: ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','😈','👿'] },
-  gestures: { icon: '👍', emojis: ['👍','👎','👏','🙌','👐','🤲','🤝','🙏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','✋','🤚','🖐','🖖','💪','🦾','✍️','🤳','💅','🫶','🫵'] },
-  objects:  { icon: '💼', emojis: ['💼','📋','📌','📎','🗂️','🗃️','💡','🔧','⚙️','🛠️','🔑','🏆','🥇','🎯','🎖️','📊','📈','📉','💰','💵','💳','🖥️','💻','📱','⌨️','🖱️','📡','🔬','📝','📖'] },
-  symbols:  { icon: '✨', emojis: ['✅','❌','⚠️','🔴','🟠','🟡','🟢','🔵','🟣','⭐','🌟','💫','✨','🔥','❤️','🧡','💛','💚','💙','💜','🖤','🤍','❗','❓','💯','🎉','🎊','🚀','🌈','🔔'] },
-};
-
-getVisibleEmojis(): string[] {
-  const q = this.emojiSearchQuery.trim().toLowerCase();
-  if (q) {
-    return Object.values(this.emojiCategories)
-      .flatMap(c => c.emojis)
-      .filter(e => e.includes(q));
+  getVisibleEmojis(): string[] {
+    const q = this.emojiSearchQuery.trim().toLowerCase();
+    if (q) {
+      return Object.values(this.emojiCategories)
+        .flatMap(c => c.emojis)
+        .filter(e => e.includes(q));
+    }
+    if (this.activeEmojiCategory === 'recent') return this.recentEmojis;
+    return this.emojiCategories[this.activeEmojiCategory]?.emojis ?? [];
   }
-  if (this.activeEmojiCategory === 'recent') return this.recentEmojis;
-  return this.emojiCategories[this.activeEmojiCategory]?.emojis ?? [];
-}
 
-insertEmoji(emoji: string, textareaEl: HTMLTextAreaElement): void {
-  const start = textareaEl.selectionStart ?? this.reviewComment.length;
-  const end   = textareaEl.selectionEnd   ?? start;
-  this.reviewComment = this.reviewComment.slice(0, start) + emoji + this.reviewComment.slice(end);
-  setTimeout(() => {
-    textareaEl.focus();
-    textareaEl.selectionStart = textareaEl.selectionEnd = start + emoji.length;
-  });
-  this.addRecentEmoji(emoji);
-}
+  insertEmoji(emoji: string, textareaEl: HTMLTextAreaElement): void {
+    const start = textareaEl.selectionStart ?? this.reviewComment.length;
+    const end   = textareaEl.selectionEnd   ?? start;
+    this.reviewComment = this.reviewComment.slice(0, start) + emoji + this.reviewComment.slice(end);
+    setTimeout(() => {
+      textareaEl.focus();
+      textareaEl.selectionStart = textareaEl.selectionEnd = start + emoji.length;
+    });
+    this.addRecentEmoji(emoji);
+  }
 
-addRecentEmoji(emoji: string): void {
-  this.recentEmojis = [emoji, ...this.recentEmojis.filter(e => e !== emoji)].slice(0, 8);
-  this.emojiCategories['recent'].emojis = this.recentEmojis;
-}
+  addRecentEmoji(emoji: string): void {
+    this.recentEmojis = [emoji, ...this.recentEmojis.filter(e => e !== emoji)].slice(0, 8);
+    this.emojiCategories['recent'].emojis = this.recentEmojis;
+  }
 
-toggleEmojiPicker(): void {
-  this.showEmojiPicker = !this.showEmojiPicker;
-  if (this.showEmojiPicker) this.emojiSearchQuery = '';
-}
+  toggleEmojiPicker(): void {
+    this.showEmojiPicker = !this.showEmojiPicker;
+    if (this.showEmojiPicker) this.emojiSearchQuery = '';
+  }
 
-// ── Star hint ──
-readonly starHints = ['', '😕 Pas top…', '😐 Peut mieux faire', '😊 C\'est bien !', '😍 Très bon !', '🤩 Parfait !'];
+  // ── Star hint ──
+  readonly starHints = ['', '😕 Pas top…', '😐 Peut mieux faire', '😊 C\'est bien !', '😍 Très bon !', '🤩 Parfait !'];
 
-getStarHintColor(): string {
-  if (this.selectedRating >= 4) return '#1a6b5a';
-  if (this.selectedRating === 3) return '#7a7869';
-  return '#e85d5d';
-}
+  getStarHintColor(): string {
+    if (this.selectedRating >= 4) return '#1a6b5a';
+    if (this.selectedRating === 3) return '#7a7869';
+    return '#e85d5d';
+  }
 }
