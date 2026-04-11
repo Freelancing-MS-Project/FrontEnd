@@ -13,7 +13,8 @@ import {
   providedIn: 'root'
 })
 export class PortfolioService {
-  private apiUrl = '';
+  // direct call to portfolio microservice
+  private apiUrl = 'http://localhost:8085';
 
   constructor(
     private http: HttpClient,
@@ -39,10 +40,6 @@ export class PortfolioService {
     });
   }
 
-  private getUserParams(userId: number): HttpParams {
-    return new HttpParams().set('userId', String(userId));
-  }
-
   private getUploadHeaders(userId: number): HttpHeaders {
     return new HttpHeaders({
       'X-User-Id': String(userId)
@@ -55,8 +52,7 @@ export class PortfolioService {
         this.http.get<PortfolioProject[]>(
           `${this.apiUrl}/profiles/me/portfolio`,
           {
-            headers: this.getHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getHeaders(userId)
           }
         )
       )
@@ -70,8 +66,7 @@ export class PortfolioService {
           `${this.apiUrl}/profiles/me/portfolio`,
           payload,
           {
-            headers: this.getHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getHeaders(userId)
           }
         )
       )
@@ -88,8 +83,7 @@ export class PortfolioService {
           `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
           payload,
           {
-            headers: this.getHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getHeaders(userId)
           }
         )
       )
@@ -102,8 +96,7 @@ export class PortfolioService {
         this.http.delete<void>(
           `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
           {
-            headers: this.getHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getHeaders(userId)
           }
         )
       )
@@ -146,8 +139,7 @@ export class PortfolioService {
           `${this.apiUrl}/profiles/me/portfolio/${projectId}/media/upload`,
           formData,
           {
-            headers: this.getUploadHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getUploadHeaders(userId)
           }
         )
       )
@@ -160,8 +152,7 @@ export class PortfolioService {
         this.http.delete<void>(
           `${this.apiUrl}/profiles/me/portfolio/media/${mediaId}`,
           {
-            headers: this.getUploadHeaders(userId),
-            params: this.getUserParams(userId)
+            headers: this.getUploadHeaders(userId)
           }
         )
       )
