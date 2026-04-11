@@ -12,7 +12,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthModule } from './features/auth/auth.module';
 import { UserModule } from './features/user/user.module';
 
-import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 
 @NgModule({
@@ -31,11 +30,6 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
     UserModule
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,

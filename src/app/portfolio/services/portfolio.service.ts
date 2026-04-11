@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import {
   PortfolioAnalysis,
   PortfolioProject,
@@ -12,35 +13,68 @@ import {
   providedIn: 'root'
 })
 export class PortfolioService {
-  private apiUrl = 'http://localhost:9091';
+  private apiUrl = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  private getHeaders(): HttpHeaders {
+  private getConnectedUserId(): Observable<number> {
+    const storedUserId = this.authService.getUserId();
+
+    if (storedUserId) {
+      return of(storedUserId);
+    }
+
+    return this.authService.getConnectedUserId().pipe(
+      map(({ userId }) => userId)
+    );
+  }
+
+  private getHeaders(userId: number): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'X-User-Id': '1'
+      'X-User-Id': String(userId)
     });
   }
 
-  private getUploadHeaders(): HttpHeaders {
+  private getUserParams(userId: number): HttpParams {
+    return new HttpParams().set('userId', String(userId));
+  }
+
+  private getUploadHeaders(userId: number): HttpHeaders {
     return new HttpHeaders({
-      'X-User-Id': '1'
+      'X-User-Id': String(userId)
     });
   }
 
   getProjects(): Observable<PortfolioProject[]> {
-    return this.http.get<PortfolioProject[]>(
-      `${this.apiUrl}/profiles/me/portfolio`,
-      { headers: this.getHeaders() }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.get<PortfolioProject[]>(
+          `${this.apiUrl}/profiles/me/portfolio`,
+          {
+            headers: this.getHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 
   addProject(payload: CreatePortfolioProjectRequest): Observable<PortfolioProject> {
-    return this.http.post<PortfolioProject>(
-      `${this.apiUrl}/profiles/me/portfolio`,
-      payload,
-      { headers: this.getHeaders() }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.post<PortfolioProject>(
+          `${this.apiUrl}/profiles/me/portfolio`,
+          payload,
+          {
+            headers: this.getHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 
@@ -48,29 +82,47 @@ export class PortfolioService {
     projectId: number,
     payload: CreatePortfolioProjectRequest
   ): Observable<PortfolioProject> {
-    return this.http.put<PortfolioProject>(
-      `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
-      payload,
-      { headers: this.getHeaders() }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.put<PortfolioProject>(
+          `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
+          payload,
+          {
+            headers: this.getHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 
   deleteProject(projectId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
-      { headers: this.getHeaders() }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.delete<void>(
+          `${this.apiUrl}/profiles/me/portfolio/${projectId}`,
+          {
+            headers: this.getHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 
   getAnalysis(freelancerId: number, username: string): Observable<PortfolioAnalysis> {
     const params = new HttpParams().set('username', username);
 
-    return this.http.get<PortfolioAnalysis>(
-      `${this.apiUrl}/portfolio/freelancer/${freelancerId}/analysis`,
-      {
-        headers: this.getHeaders(),
-        params
-      }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.get<PortfolioAnalysis>(
+          `${this.apiUrl}/portfolio/freelancer/${freelancerId}/analysis`,
+          {
+            headers: this.getHeaders(userId),
+            params
+          }
+        )
+      )
     );
   }
 
@@ -88,19 +140,31 @@ export class PortfolioService {
       formData.append('displayOrder', displayOrder.toString());
     }
 
-    return this.http.post<PortfolioMedia>(
-      `${this.apiUrl}/profiles/me/portfolio/${projectId}/media/upload`,
-      formData,
-      { headers: this.getUploadHeaders() }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.post<PortfolioMedia>(
+          `${this.apiUrl}/profiles/me/portfolio/${projectId}/media/upload`,
+          formData,
+          {
+            headers: this.getUploadHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 
   deleteMedia(mediaId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/profiles/me/portfolio/media/${mediaId}`,
-      {
-        headers: this.getUploadHeaders()
-      }
+    return this.getConnectedUserId().pipe(
+      switchMap((userId) =>
+        this.http.delete<void>(
+          `${this.apiUrl}/profiles/me/portfolio/media/${mediaId}`,
+          {
+            headers: this.getUploadHeaders(userId),
+            params: this.getUserParams(userId)
+          }
+        )
+      )
     );
   }
 }
