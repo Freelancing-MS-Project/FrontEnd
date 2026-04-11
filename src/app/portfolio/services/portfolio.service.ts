@@ -12,7 +12,7 @@ import {
   providedIn: 'root'
 })
 export class PortfolioService {
-  private apiUrl = 'http://localhost:8081';
+  private apiUrl = 'http://localhost:9091';
 
   constructor(private http: HttpClient) {}
 
@@ -99,9 +99,7 @@ export class PortfolioService {
     return this.http.delete<void>(
       `${this.apiUrl}/profiles/me/portfolio/media/${mediaId}`,
       {
-        headers: new HttpHeaders({
-          'X-User-Id': '1'
-        })
+        headers: this.getUploadHeaders()
       }
     );
   }
