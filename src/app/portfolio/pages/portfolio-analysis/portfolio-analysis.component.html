@@ -1,0 +1,163 @@
+<div class="portfolio-page-container">
+  <div class="portfolio-content-container">
+    <div class="portfolio-shell">
+      <div class="analysis-page">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">Portfolio Insights</p>
+            <h2>Portfolio Analysis</h2>
+            <p class="subtitle">
+              A clear overview of your portfolio's strength, visibility, and areas for improvement.
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="loading" class="state-card info-card">
+          <div class="state-icon">⏳</div>
+          <div>
+            <h4>Loading analysis</h4>
+            <p>Please wait while we analyze your portfolio.</p>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="state-card error-card">
+          <div class="state-icon">⚠️</div>
+          <div>
+            <h4>Something went wrong</h4>
+            <p>{{ error }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="analysis" class="analysis-layout">
+          <div class="left-column">
+            <div class="hero-card">
+              <div class="hero-top">
+                <span class="badge">Overall Performance</span>
+              </div>
+
+              <div class="score-ring" [style.--score]="analysis.score">
+                <div class="score-value">{{ analysis.score }}</div>
+                <div class="score-label">Score</div>
+              </div>
+
+              <div class="level-pill">{{ analysis.level }}</div>
+
+              <p class="hero-text">
+                This score reflects the current quality, completeness, and professional value of your portfolio.
+              </p>
+            </div>
+
+            <div class="card suggestions-card">
+              <div class="section-title">
+                <h4>Suggestions</h4>
+                <span>Actionable improvements</span>
+              </div>
+
+              <ul class="suggestion-list">
+                <li *ngFor="let suggestion of analysis.suggestions">
+                  <span class="bullet">✓</span>
+                  <span>{{ suggestion }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="right-column">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-label">Projects</span>
+                <h3>{{ analysis.projectCount }}</h3>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Total Media</span>
+                <h3>{{ analysis.totalMediaCount }}</h3>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Media Coverage</span>
+                <h3>{{ analysis.mediaCoveragePercentage }}%</h3>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Average Description Length</span>
+                <h3>{{ analysis.averageDescriptionLength }}</h3>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Projects with Repo</span>
+                <h3>{{ analysis.projectsWithRepoUrl }}</h3>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Projects with Live URL</span>
+                <h3>{{ analysis.projectsWithLiveUrl }}</h3>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">
+                <h4>Completed Missions Feedback</h4>
+                <span>Feedback received after delivered missions</span>
+              </div>
+
+              <div class="review-summary">
+                <div class="review-box">
+                  <span>Average Mission Rating</span>
+                  <strong>{{ analysis.averageRating }}</strong>
+                </div>
+                <div class="review-box">
+                  <span>Completed Mission Reviews</span>
+                  <strong>{{ analysis.totalReviews }}</strong>
+                </div>
+              </div>
+
+              <div class="review-comments" *ngIf="analysis.latestReviewComments?.length">
+                <h5>Recent Mission Feedback</h5>
+                <ul>
+                  <li *ngFor="let comment of analysis.latestReviewComments">
+                    {{ comment }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">
+                <h4>Score Breakdown</h4>
+                <span>Detailed scoring categories</span>
+              </div>
+
+              <div class="breakdown-list">
+                <div class="breakdown-row">
+                  <span>Project Score</span>
+                  <strong>{{ analysis.details.projectScore }}</strong>
+                </div>
+                <div class="breakdown-row">
+                  <span>Media Score</span>
+                  <strong>{{ analysis.details.mediaScore }}</strong>
+                </div>
+                <div class="breakdown-row">
+                  <span>Description Score</span>
+                  <strong>{{ analysis.details.descriptionScore }}</strong>
+                </div>
+                <div class="breakdown-row">
+                  <span>Repository Score</span>
+                  <strong>{{ analysis.details.repoScore }}</strong>
+                </div>
+                <div class="breakdown-row">
+                  <span>Live URL Score</span>
+                  <strong>{{ analysis.details.liveUrlScore }}</strong>
+                </div>
+                <div class="breakdown-row">
+                  <span>Review Score</span>
+                  <strong>{{ analysis.details.reviewScore }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
