@@ -1,0 +1,98 @@
+<section class="contact section">
+  <div class="container section-title" data-aos="fade-up">
+    <span>Compte</span>
+    <h2>Mon profil</h2>
+    <p>Données récupérées depuis <code>/api/users/me</code>.</p>
+  </div>
+
+  <div class="container">
+    <div *ngIf="errorMessage" class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="error-message d-block">{{ errorMessage }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="sent-message d-block">{{ successMessage }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="contact-form card">
+          <div class="card-body p-4 p-lg-5">Chargement du profil...</div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="user && !isLoading" class="row gy-4">
+      <div class="col-lg-4">
+        <div class="contact-form card h-100">
+          <div class="card-body p-4 p-lg-5 text-center">
+            <img
+              *ngIf="imageUrl; else fallbackAvatar"
+              [src]="imageUrl"
+              alt="Photo utilisateur"
+              class="img-fluid rounded-circle mb-3"
+              width="140"
+              height="140"
+            />
+            <ng-template #fallbackAvatar>
+              <div class="d-inline-flex align-items-center justify-content-center rounded-circle border mb-3 p-5">
+                {{ user.firstName.charAt(0) || user.email.charAt(0) }}
+              </div>
+            </ng-template>
+            <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+            <p>{{ user.email }}</p>
+            <span class="badge bg-secondary">{{ user.role }}</span>
+            <div class="mt-4" *ngIf="isAdmin">
+              <a class="btn btn-submit" routerLink="/admin/users">Administration</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="contact-form card h-100">
+          <div class="card-body p-4 p-lg-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">Informations</h4>
+              <button class="btn btn-submit" type="button" (click)="toggleEdit()">
+                {{ editMode ? 'Annuler' : 'Modifier le profil' }}
+              </button>
+            </div>
+
+            <div *ngIf="!editMode" class="row gy-4">
+              <div class="col-md-6"><strong>Prénom</strong><div>{{ user.firstName || '-' }}</div></div>
+              <div class="col-md-6"><strong>Nom</strong><div>{{ user.lastName || '-' }}</div></div>
+              <div class="col-md-6"><strong>CIN</strong><div>{{ user.cin || '-' }}</div></div>
+              <div class="col-md-6"><strong>Rôle</strong><div>{{ user.role }}</div></div>
+              <div class="col-md-6"><strong>Créé le</strong><div>{{ user.createdAt | date:'medium' }}</div></div>
+              <div class="col-md-6"><strong>Mis à jour le</strong><div>{{ user.updatedAt | date:'medium' }}</div></div>
+            </div>
+
+            <form *ngIf="editMode" [formGroup]="profileForm" (ngSubmit)="save()" class="php-email-form">
+              <div class="row gy-4">
+                <div class="col-md-6">
+                  <input id="firstName" type="text" class="form-control" formControlName="firstName" placeholder="Prénom" />
+                </div>
+                <div class="col-md-6">
+                  <input id="lastName" type="text" class="form-control" formControlName="lastName" placeholder="Nom" />
+                </div>
+                <div class="col-md-6">
+                  <input id="cin" type="text" class="form-control" formControlName="cin" placeholder="CIN" />
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-submit w-100" type="submit" [disabled]="isSaving">
+                    {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

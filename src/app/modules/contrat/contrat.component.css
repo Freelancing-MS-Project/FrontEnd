@@ -1,0 +1,211 @@
+.contrat {
+  padding: 90px 0 60px;
+}
+
+.contract-shell {
+  background: var(--surface-color);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 88%);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 1.75rem;
+}
+
+.contract-head {
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color), transparent 92%), var(--surface-color));
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
+}
+
+.head-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: color-mix(in srgb, var(--accent-color), transparent 86%);
+  color: var(--accent-color);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.86rem;
+}
+
+.contract-head h2 {
+  margin: 0.85rem 0 0.5rem;
+  color: var(--heading-color);
+  font-size: 1.55rem;
+}
+
+.contract-head p {
+  margin: 0;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+}
+
+.form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--heading-color);
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+.form-label i {
+  color: var(--accent-color);
+}
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon > i {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: color-mix(in srgb, var(--accent-color), transparent 20%);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.input-icon .form-control {
+  border-radius: 12px;
+  min-height: 46px;
+  padding-left: 2.45rem;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 84%);
+}
+
+.input-icon .form-control[readonly] {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 96%);
+}
+
+.input-icon .form-control:focus {
+  border-color: color-mix(in srgb, var(--accent-color), transparent 45%);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 88%);
+}
+
+.signature-head {
+  margin-bottom: 0.75rem;
+}
+
+.signature-head h3 {
+  margin: 0;
+  color: var(--heading-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.15rem;
+}
+
+.signature-head h3 i {
+  color: var(--accent-color);
+}
+
+.signature-head p {
+  margin: 0.45rem 0 0;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+}
+
+.signature-wrapper {
+  width: 100%;
+  border: 1px dashed color-mix(in srgb, var(--accent-color), transparent 55%);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface-color), var(--accent-color) 2%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color), transparent 92%);
+}
+
+.signature-canvas {
+  width: 100%;
+  height: 220px;
+  display: block;
+  border-radius: 16px;
+  cursor: crosshair;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.btn-clear,
+.btn-sign {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-clear {
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 75%);
+  color: var(--default-color);
+  background: var(--surface-color);
+}
+
+.btn-clear:hover {
+  border-color: color-mix(in srgb, var(--default-color), transparent 58%);
+  background: color-mix(in srgb, var(--default-color), transparent 95%);
+}
+
+.btn-sign {
+  border: none;
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.btn-sign:hover,
+.btn-sign:focus {
+  background: color-mix(in srgb, var(--accent-color), black 8%);
+  color: var(--contrast-color);
+}
+
+.btn-sign:disabled {
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+.status-banner {
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.status-loading {
+  color: #0c5460;
+  border-color: #9fd7e0;
+  background: #e3f5f8;
+}
+
+.status-success {
+  color: #0f5132;
+  border-color: #a8dbc2;
+  background: #e8f7ee;
+}
+
+.status-error {
+  color: #842029;
+  border-color: #efbac2;
+  background: #fdecef;
+}
+
+@media (max-width: 768px) {
+  .contrat {
+    padding-top: 80px;
+  }
+
+  .contract-shell {
+    padding: 1.1rem;
+  }
+
+  .contract-head h2 {
+    font-size: 1.3rem;
+  }
+}
