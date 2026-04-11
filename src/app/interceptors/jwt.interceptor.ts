@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AuthService } from '../core/services/auth.service';
+import { API_BASE_URL } from '../core/constants/api.constants';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -24,7 +25,11 @@ export class JwtInterceptor implements HttpInterceptor {
 
     return next.handle(authRequest).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && this.authService.isLoggedIn()) {
+        if (
+          error.status === 401 &&
+          this.authService.isLoggedIn() &&
+          this.shouldLogoutOnUnauthorized(request)
+        ) {
           this.authService.logout();
           this.router.navigate(['/login'], {
             queryParams: { reason: 'session-expired' }
@@ -34,5 +39,9 @@ export class JwtInterceptor implements HttpInterceptor {
         return throwError(() => error);
       })
     );
+  }
+
+  private shouldLogoutOnUnauthorized(request: HttpRequest<unknown>): boolean {
+    return request.url.startsWith(API_BASE_URL);
   }
 }
